@@ -257,7 +257,6 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
                             writer.write(string);
                         }
                         writer.flush();
-                        writer.close();
                     } finally {
                         out.close();
                     }
@@ -265,6 +264,7 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
                     return true;
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to save note to " + FILENAME, e);
+                    SecureNoteActivity.super.getFileStreamPath(FILENAME).delete();
                     return false;
                 }
             }
