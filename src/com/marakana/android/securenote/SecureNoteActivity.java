@@ -247,17 +247,19 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
                 try {
                     OutputStream out = SecureNoteActivity.super.openFileOutput(FILENAME,
                             MODE_PRIVATE);
-                    Cipher cipher = CryptUtil.getEncryptCipher(SecureNoteActivity.this.key);
-                    byte[] iv = CryptUtil.getIv(cipher);
-                    out.write(iv);
-                    out = new CipherOutputStream(out, cipher);
-                    Writer writer = new OutputStreamWriter(out, CHARSET);
                     try {
+                        Cipher cipher = CryptUtil.getEncryptCipher(SecureNoteActivity.this.key);
+                        byte[] iv = CryptUtil.getIv(cipher);
+                        out.write(iv);
+                        out = new CipherOutputStream(out, cipher);
+                        Writer writer = new OutputStreamWriter(out, CHARSET);
                         for (String string : strings) {
                             writer.write(string);
                         }
-                    } finally {
+                        writer.flush();
                         writer.close();
+                    } finally {
+                        out.close();
                     }
                     Log.d(TAG, "Saved note to " + FILENAME);
                     return true;
@@ -287,11 +289,11 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
             protected String doInBackground(Void... params) {
                 try {
                     InputStream in = SecureNoteActivity.super.openFileInput(FILENAME);
-                    byte[] iv = CryptUtil.getIv(in);
-                    Cipher cipher = CryptUtil.getDecryptCipher(SecureNoteActivity.this.key, iv);
-                    in = new CipherInputStream(in, cipher);
-                    Reader reader = new InputStreamReader(in, CHARSET);
                     try {
+                        byte[] iv = CryptUtil.getIv(in);
+                        Cipher cipher = CryptUtil.getDecryptCipher(SecureNoteActivity.this.key, iv);
+                        in = new CipherInputStream(in, cipher);
+                        Reader reader = new InputStreamReader(in, CHARSET);
                         StringBuilder out = new StringBuilder(1024);
                         CharBuffer buffer = CharBuffer.allocate(64);
                         for (int n; (n = reader.read(buffer)) != -1;) {
@@ -301,7 +303,7 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
                         Log.d(TAG, "Loaded note from " + FILENAME);
                         return out.toString();
                     } finally {
-                        reader.close();
+                        in.close();
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to load note from " + FILENAME, e);
