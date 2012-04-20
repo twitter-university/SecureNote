@@ -1,6 +1,8 @@
 
 package com.marakana.android.securenote;
 
+import java.security.NoSuchAlgorithmException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -58,31 +60,57 @@ public class GetPasswordActivity extends Activity implements OnClickListener, Te
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.password.getText().clear();
+        this.passwordVerification.getText().clear();
+        Log.d(TAG, "Cleared password fields");
+    }
+
     public void onClick(View v) {
         if (v == this.ok) {
-            Intent data = new Intent();
-            data.putExtra(PASSWORD_RESPONSE_PARAM, this.password.getText().toString());
-            super.setResult(RESULT_OK, data);
+            Intent reply = new Intent();
+            int passwordLength = this.password.getText().length();
+            byte[] password = new byte[passwordLength * 2];
+            for (int i = 0; i < passwordLength; i++) {
+                char ch = this.password.getText().charAt(i);
+                password[i * 2] = (byte)(ch >> 8);
+                password[i * 2 + 1] = (byte)ch;
+            }
+            try {
+                reply.putExtra(PASSWORD_RESPONSE_PARAM, CryptUtil.getKey(password, true));
+            } catch (NoSuchAlgorithmException e) {
+                Log.wtf(TAG, "Failed to get key for password", e);
+                super.setResult(RESULT_CANCELED, reply);
+            }
+            super.setResult(RESULT_OK, reply);
         } else if (v == this.cancel) {
             super.setResult(RESULT_CANCELED);
         }
+        // the passwords will be cleared during onPause()
         super.finish();
     }
 
     public void afterTextChanged(Editable s) {
         if (this.password.length() < this.minPasswordLength) {
             Log.d(TAG, "Password too short");
+            this.ok.setEnabled(false);
         } else if (this.password.length() != this.passwordVerification.length()) {
             Log.d(TAG, "Passwords' length differs");
-        } else if (!this.password.getText().toString().equals(
-                this.passwordVerification.getText().toString())) {
-            Log.d(TAG, "Passwords differ");
+            this.ok.setEnabled(false);
         } else {
+            for (int i = 0; i < this.password.getText().length(); i++) {
+                if (this.password.getText().charAt(i) != this.passwordVerification.getText()
+                        .charAt(i)) {
+                    Log.d(TAG, "Passwords differ");
+                    this.ok.setEnabled(false);
+                    return;
+                }
+            }
             Log.d(TAG, "Passwords are the same");
             this.ok.setEnabled(true);
-            return;
         }
-        this.ok.setEnabled(false);
     }
 
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {

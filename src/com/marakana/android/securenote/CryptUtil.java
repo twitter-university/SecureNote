@@ -1,84 +1,73 @@
 
 package com.marakana.android.securenote;
 
+import java.io.EOFException;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidParameterSpecException;
+import java.util.Arrays;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import android.util.Base64;
-
 public class CryptUtil {
-    private static final String ENCRYPTION_ALGORITHM = "AES";
 
-    private static final int KEY_SIZE = 256;
+    public static final int IV_LENGTH = 16;
 
-    private static final String RANDOM_ALGORITHM = "SHA1PRNG";
+    public static byte[] getIv(InputStream in) throws IOException {
+        byte[] iv = new byte[IV_LENGTH];
+        for (int i = 0; i < iv.length;) {
+            int nRead = in.read(iv, i, iv.length - i);
+            if (nRead == -1) {
+                throw new EOFException("Unexpected EOF");
+            } else {
+                i += nRead;
+            }
+        }
+        return iv;
+    }
 
-    private static final String CHARSET = "UTF-8";
+    public static Key getKey(byte[] secret) throws NoSuchAlgorithmException {
+        return getKey(secret, false);
+    }
 
-    public static Cipher getCipher(int mode, byte[] secret) throws NoSuchAlgorithmException,
-            NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException {
+    public static Key getKey(byte[] secret, boolean wipeSecret) throws NoSuchAlgorithmException {
         // generate an encryption/decryption key from random data seeded with
         // our secret (i.e. password)
-        SecureRandom secureRandom = SecureRandom.getInstance(RANDOM_ALGORITHM);
+        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
         secureRandom.setSeed(secret);
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM);
-        keyGenerator.init(KEY_SIZE, secureRandom);
-        Key key = new SecretKeySpec(keyGenerator.generateKey().getEncoded(), ENCRYPTION_ALGORITHM);
-        // get a cipher based on the specified encryption algorithm
-        Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
-        // tell the cipher if it will be used for encryption or decryption
-        // (i.e. cipher mode) and give it our key
-        cipher.init(mode, key);
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(256, secureRandom);
+        Key key = new SecretKeySpec(keyGenerator.generateKey().getEncoded(), "AES");
+        if (wipeSecret) {
+            Arrays.fill(secret, (byte)0);
+        }
+        return key;
+    }
+
+    public static byte[] getIv(Cipher cipher) throws InvalidParameterSpecException {
+        return cipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
+    }
+
+    public static Cipher getEncryptCipher(Key key) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidKeyException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
         return cipher;
     }
 
-    public static byte[] encrypt(byte[] input, byte[] secret) throws InvalidKeyException,
-            IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException,
-            NoSuchPaddingException, UnsupportedEncodingException {
-        return getCipher(Cipher.ENCRYPT_MODE, secret).doFinal(input);
-    }
-
-    public static byte[] decrypt(byte[] input, byte[] secret) throws InvalidKeyException,
-            IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException,
-            NoSuchPaddingException, UnsupportedEncodingException {
-        return getCipher(Cipher.DECRYPT_MODE, secret).doFinal(input);
-    }
-
-    public static String encrypt(String input, String secret) throws InvalidKeyException,
-            IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException,
-            NoSuchPaddingException, UnsupportedEncodingException {
-        return Base64.encodeToString(encrypt(input.getBytes(CHARSET), secret.getBytes(CHARSET)),
-                Base64.DEFAULT);
-    }
-
-    public static String decrypt(String input, String secret) throws InvalidKeyException,
-            IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException,
-            NoSuchPaddingException, UnsupportedEncodingException {
-        return new String(decrypt(Base64.decode(input.getBytes(), Base64.DEFAULT), secret
-                .getBytes(CHARSET)), CHARSET);
-    }
-
-    public static OutputStream encrypt(OutputStream out, byte[] secret) throws InvalidKeyException,
-            NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException {
-        return new CipherOutputStream(out, getCipher(Cipher.ENCRYPT_MODE, secret));
-    }
-
-    public static InputStream decrypt(InputStream in, byte[] secret) throws InvalidKeyException,
-            NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException {
-        return new CipherInputStream(in, CryptUtil.getCipher(Cipher.DECRYPT_MODE, secret));
+    public static Cipher getDecryptCipher(Key key, byte[] iv) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+        return cipher;
     }
 }

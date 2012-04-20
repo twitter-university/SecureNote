@@ -1,11 +1,18 @@
 
 package com.marakana.android.securenote;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.security.Key;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -47,7 +54,7 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
 
     private Button closeButton;
 
-    private String password;
+    private Key key;
 
     private boolean autoCloseOnStop = false;
 
@@ -63,8 +70,9 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
         this.saveButton.setOnClickListener(this);
         this.closeButton.setOnClickListener(this);
         this.noteText.addTextChangedListener(this);
-        this.password = savedInstanceState == null ? null : savedInstanceState
-                .getString(PASSWORD_KEY);
+        if (savedInstanceState != null) {
+            this.key = (Key)savedInstanceState.getSerializable(PASSWORD_KEY); // ???
+        }
     }
 
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -86,7 +94,7 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(PASSWORD_KEY, this.password);
+        outState.putSerializable(PASSWORD_KEY, this.key); // ???
     }
 
     @Override
@@ -97,7 +105,7 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.change_password_button).setEnabled(this.password != null);
+        menu.findItem(R.id.change_password_button).setEnabled(this.key != null);
         menu.findItem(R.id.delete_button).setEnabled(this.isSecureNoteFilePresent());
         return true;
     }
@@ -109,8 +117,10 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
                 this.getPassword(CHANGE_PASSWORD, true);
                 return true;
             case R.id.delete_button:
-                new AlertDialog.Builder(this).setMessage(R.string.delete_alert)
-                        .setCancelable(false).setPositiveButton(android.R.string.yes,
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.delete_alert)
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.yes,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         SecureNoteActivity.this.deleteSecureNote();
@@ -147,7 +157,8 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RESULT_OK:
-                this.password = data.getStringExtra(GetPasswordActivity.PASSWORD_RESPONSE_PARAM);
+                this.key = (Key)data
+                        .getSerializableExtra(GetPasswordActivity.PASSWORD_RESPONSE_PARAM);
                 switch (requestCode) {
                     case GET_PASSWORD_FOR_LOAD:
                         this.loadSecureNote();
@@ -172,13 +183,13 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
 
     public void onClick(View v) {
         if (v == this.loadButton) {
-            if (this.password == null) {
+            if (this.key == null) {
                 this.getPassword(GET_PASSWORD_FOR_LOAD, false);
             } else {
                 this.loadSecureNote();
             }
         } else if (v == this.saveButton) {
-            if (this.password == null) {
+            if (this.key == null) {
                 this.getPassword(GET_PASSWORD_FOR_SAVE, true);
             } else {
                 this.saveSecureNote();
@@ -186,7 +197,9 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
         } else if (v == this.closeButton) {
             Log.d(TAG, "Closing...");
             if (this.saveButton.isEnabled()) {
-                new AlertDialog.Builder(this).setMessage(R.string.close_alert).setCancelable(false)
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.close_alert)
+                        .setCancelable(false)
                         .setPositiveButton(android.R.string.yes,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
@@ -201,16 +214,17 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
 
     @Override
     protected void onDestroy() {
-        this.password = null;
+        super.onDestroy();
+        this.key = null;
         this.noteText.getText().clear();
         this.noteText = null;
-        super.onDestroy();
+        System.exit(0);
     }
 
     private void deleteSecureNote() {
         Log.d(TAG, "Deleteting note");
         if (super.getFileStreamPath(FILENAME).delete()) {
-            this.password = null;
+            this.key = null;
             this.noteText.getText().clear();
             this.loadButton.setVisibility(View.GONE);
             this.saveButton.setVisibility(View.VISIBLE);
@@ -231,9 +245,13 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
             @Override
             protected Boolean doInBackground(String... strings) {
                 try {
-                    Writer writer = new OutputStreamWriter(CryptUtil.encrypt(
-                            SecureNoteActivity.super.openFileOutput(FILENAME, MODE_PRIVATE),
-                            SecureNoteActivity.this.password.getBytes(CHARSET)), CHARSET);
+                    OutputStream out = SecureNoteActivity.super.openFileOutput(FILENAME,
+                            MODE_PRIVATE);
+                    Cipher cipher = CryptUtil.getEncryptCipher(SecureNoteActivity.this.key);
+                    byte[] iv = CryptUtil.getIv(cipher);
+                    out.write(iv);
+                    out = new CipherOutputStream(out, cipher);
+                    Writer writer = new OutputStreamWriter(out, CHARSET);
                     try {
                         for (String string : strings) {
                             writer.write(string);
@@ -268,9 +286,11 @@ public class SecureNoteActivity extends Activity implements OnClickListener, Tex
             @Override
             protected String doInBackground(Void... params) {
                 try {
-                    Reader reader = new InputStreamReader(CryptUtil.decrypt(
-                            SecureNoteActivity.super.openFileInput(FILENAME),
-                            SecureNoteActivity.this.password.getBytes(CHARSET)), CHARSET);
+                    InputStream in = SecureNoteActivity.super.openFileInput(FILENAME);
+                    byte[] iv = CryptUtil.getIv(in);
+                    Cipher cipher = CryptUtil.getDecryptCipher(SecureNoteActivity.this.key, iv);
+                    in = new CipherInputStream(in, cipher);
+                    Reader reader = new InputStreamReader(in, CHARSET);
                     try {
                         StringBuilder out = new StringBuilder(1024);
                         CharBuffer buffer = CharBuffer.allocate(64);
