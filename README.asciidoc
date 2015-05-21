@@ -1,13 +1,5 @@
-= About This Project
+= Storage Encryption
 
-This Android Eclipse project demonstrates how [not] to protect data in an Android application.
+This project was created to support various http://thenewcircle.com/training/android/[NewCircle Android Training] courses.
 
-This code was developed to support Marakana's Android Training courses.
-
-For more info, see http://marakana.com/training/android/
-
-== Legal
-
-Please see ++NOTICE++ file in this directory for copyright, license terms, and legal disclaimers.
-
-Copyright © 2012 Marakana Inc.
+This application is intended to demonstrate the use of Java cryptography to encrypt data in Android.
