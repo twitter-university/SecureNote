@@ -2,22 +2,11 @@
 package com.example.android.securenote;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.security.Key;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,43 +26,40 @@ import com.example.android.securenote.crypto.PasswordEncryptor;
 import com.example.android.securenote.crypto.RSAHardwareEncryptor;
 
 public class SecureNoteActivity extends Activity implements
-        OnClickListener, TextWatcher {
+        OnClickListener, TextWatcher, GetPasswordDialog.OnPasswordListener {
     private static final String TAG = SecureNoteActivity.class.getSimpleName();
 
-    private static final String PASSWORD_KEY = "password";
-    private static final String CHARSET = "UTF-8";
     private static final String FILENAME = "secure.note";
 
     /* Password Activity Actions */
     private static final int GET_PASSWORD_FOR_LOAD = 1;
     private static final int GET_PASSWORD_FOR_SAVE = 2;
 
-    private EditText noteText;
-    private TextView resultText;
-    private RadioGroup encryptionSelect;
-    private Button loadButton;
-    private Button saveButton;
+    private EditText mNoteText;
+    private TextView mResultText;
+    private RadioGroup mEncryptionSelect;
+    private Button mSaveButton;
 
-    private PasswordEncryptor passwordEncryptor;
-    private RSAHardwareEncryptor hardwareEncryptor;
+    private PasswordEncryptor mPasswordEncryptor;
+    private RSAHardwareEncryptor mHardwareEncryptor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.secure_note);
 
-        this.noteText = (EditText) findViewById(R.id.note_text);
-        this.resultText = (TextView) findViewById(R.id.text_result);
-        this.encryptionSelect = (RadioGroup) findViewById(R.id.type_select);
-        this.loadButton = (Button) findViewById(R.id.load_button);
-        this.saveButton = (Button) findViewById(R.id.save_button);
+        mNoteText = (EditText) findViewById(R.id.note_text);
+        mResultText = (TextView) findViewById(R.id.text_result);
+        mEncryptionSelect = (RadioGroup) findViewById(R.id.type_select);
+        mSaveButton = (Button) findViewById(R.id.save_button);
 
-        this.loadButton.setOnClickListener(this);
-        this.saveButton.setOnClickListener(this);
-        this.noteText.addTextChangedListener(this);
+        findViewById(R.id.load_button).setOnClickListener(this);
+        mSaveButton.setOnClickListener(this);
+        mNoteText.addTextChangedListener(this);
+        mNoteText.setText(null);
 
-        passwordEncryptor = new PasswordEncryptor();
-        hardwareEncryptor = new RSAHardwareEncryptor(this);
+        mPasswordEncryptor = new PasswordEncryptor();
+        mHardwareEncryptor = new RSAHardwareEncryptor(this);
     }
 
     @Override
@@ -101,7 +87,9 @@ public class SecureNoteActivity extends Activity implements
                                     public void onClick(DialogInterface dialog, int id) {
                                         deleteSecureNote();
                                     }
-                                }).setNegativeButton(android.R.string.no, null).show();
+                                })
+                        .setNegativeButton(android.R.string.no, null)
+                        .show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -110,11 +98,10 @@ public class SecureNoteActivity extends Activity implements
 
     private void getPassword(int requestCode, boolean verifyPasswords) {
         Log.d(TAG, "Getting password");
-        Intent intent = new Intent(this, GetPasswordActivity.class);
-        intent.putExtra(GetPasswordActivity.MIN_PASSWORD_LENGTH_REQUEST_PARAM, 6);
-        intent.putExtra(GetPasswordActivity.VERIFY_PASSWORD_REQUEST_PARAM, verifyPasswords);
-
-        startActivityForResult(intent, requestCode);
+        GetPasswordDialog dialog = GetPasswordDialog.newInstance(requestCode,
+                6, verifyPasswords);
+        dialog.show(getFragmentManager(),
+                GetPasswordDialog.class.getSimpleName());
     }
 
     private boolean isSecureNoteFilePresent() {
@@ -122,30 +109,24 @@ public class SecureNoteActivity extends Activity implements
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
-            case RESULT_OK:
-                String passkey = data.getStringExtra(
-                        GetPasswordActivity.PASSWORD_RESPONSE_PARAM);
-                switch (requestCode) {
-                    case GET_PASSWORD_FOR_LOAD:
-                        this.loadSecureNote(passkey);
-                        break;
-                    case GET_PASSWORD_FOR_SAVE:
-                        this.saveSecureNote(passkey);
-                        break;
-                }
+    public void onPasswordValid(int requestType, String password) {
+        switch (requestType) {
+            case GET_PASSWORD_FOR_LOAD:
+                this.loadSecureNote(password);
                 break;
-            case RESULT_CANCELED:
-                Log.d(TAG, "Canceled result. Ignoring.");
+            case GET_PASSWORD_FOR_SAVE:
+                this.saveSecureNote(password);
                 break;
-            default:
-                Log.w(TAG, "Unexpected result: " + resultCode);
         }
     }
 
+    @Override
+    public void onPasswordCancel() {
+        Log.d(TAG, "Canceled result. Ignoring.");
+    }
+
     public void onClick(View v) {
-        int encryptionType = this.encryptionSelect.getCheckedRadioButtonId();
+        int encryptionType = mEncryptionSelect.getCheckedRadioButtonId();
         switch (v.getId()) {
             case R.id.load_button:
                 if (encryptionType == R.id.type_password) {
@@ -169,7 +150,7 @@ public class SecureNoteActivity extends Activity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.noteText.getText().clear();
+        mNoteText.getText().clear();
     }
 
     private void deleteSecureNote() {
@@ -191,11 +172,11 @@ public class SecureNoteActivity extends Activity implements
             protected Boolean doInBackground(String... strings) {
                 try {
                     OutputStream out = openFileOutput(FILENAME, MODE_PRIVATE);
-                    String note = strings[0];
+                    byte[] noteData = strings[0].getBytes();
                     if (passkey == null) {
-                        hardwareEncryptor.encryptData(note.getBytes(), out);
+                        mHardwareEncryptor.encryptData(noteData, out);
                     } else {
-                        passwordEncryptor.encryptData(passkey, note.getBytes(), out);
+                        mPasswordEncryptor.encryptData(passkey, noteData, out);
                     }
                     Log.d(TAG, "Saved note to " + FILENAME);
 
@@ -210,14 +191,14 @@ public class SecureNoteActivity extends Activity implements
             @Override
             protected void onPostExecute(Boolean result) {
                 if (result) {
-                    SecureNoteActivity.this.noteText.getText().clear();
+                    mNoteText.getText().clear();
                     toast(R.string.saved_note);
                 } else {
                     toast(R.string.failed_to_save);
                 }
             }
 
-        }.execute(this.noteText.getText().toString());
+        }.execute(mNoteText.getText().toString());
     }
 
     private void loadSecureNote(final String passkey) {
@@ -229,9 +210,9 @@ public class SecureNoteActivity extends Activity implements
                     InputStream in = openFileInput(FILENAME);
                     byte[] decrypted;
                     if (passkey == null) {
-                        decrypted = hardwareEncryptor.decryptData(in);
+                        decrypted = mHardwareEncryptor.decryptData(in);
                     } else {
-                        decrypted = passwordEncryptor.decryptData(passkey, in);
+                        decrypted = mPasswordEncryptor.decryptData(passkey, in);
                     }
                     Log.d(TAG, "Loaded note from " + FILENAME);
                     return new String(decrypted);
@@ -246,7 +227,7 @@ public class SecureNoteActivity extends Activity implements
                 if (result == null) {
                     toast(R.string.failed_to_load);
                 } else {
-                    SecureNoteActivity.this.resultText.setText(result);
+                    mResultText.setText(result);
                     toast(R.string.loaded_note);
                 }
             }
@@ -258,7 +239,7 @@ public class SecureNoteActivity extends Activity implements
     }
 
     public void afterTextChanged(Editable s) {
-        this.saveButton.setEnabled(true);
+        mSaveButton.setEnabled(s.length() != 0);
     }
 
     @Override

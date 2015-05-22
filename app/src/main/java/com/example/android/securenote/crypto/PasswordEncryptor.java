@@ -42,8 +42,10 @@ public class PasswordEncryptor {
      * Return a cipher text blob of encrypted data, Base64 encoded.
      *
      * @throws GeneralSecurityException
+     * @throws IOException
      */
-    public void encryptData(String passphrase, byte[] data, OutputStream out) throws GeneralSecurityException, IOException {
+    public void encryptData(String passphrase, byte[] data, OutputStream out) throws
+            GeneralSecurityException, IOException {
         Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
 
         byte[] salt = new byte[SALT_LENGTH];
@@ -76,7 +78,8 @@ public class PasswordEncryptor {
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    public byte[] decryptData(String passphrase, InputStream in) throws GeneralSecurityException, IOException {
+    public byte[] decryptData(String passphrase, InputStream in) throws
+            GeneralSecurityException, IOException {
         //Unpack cipherText
         String cipherText = readFile(in);
         String[] fields = cipherText.split(DELIMITER);
@@ -96,14 +99,17 @@ public class PasswordEncryptor {
         return cipher.doFinal(encrypted);
     }
 
-    private SecretKey generateSecretKey(char[] passphraseOrPin, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private SecretKey generateSecretKey(char[] passphraseOrPin, byte[] salt) throws
+            NoSuchAlgorithmException, InvalidKeySpecException {
         // Number of PBKDF2 hardening rounds to use. Larger values increase
         // computation time. You should select a value that causes computation
         // to take >100ms.
         final int iterations = 1000;
 
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        KeySpec keySpec = new PBEKeySpec(passphraseOrPin, salt, iterations, KEY_LENGTH);
+        SecretKeyFactory secretKeyFactory =
+                SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        KeySpec keySpec =
+                new PBEKeySpec(passphraseOrPin, salt, iterations, KEY_LENGTH);
         byte[] keyBytes = secretKeyFactory.generateSecret(keySpec).getEncoded();
         return new SecretKeySpec(keyBytes, "AES");
     }

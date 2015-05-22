@@ -66,7 +66,14 @@ public class RSAHardwareEncryptor {
         }
     }
 
-    public void encryptData(byte[] data, OutputStream out) throws GeneralSecurityException, IOException {
+    /**
+     * Return a cipher text blob of encrypted data, Base64 encoded.
+     *
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public void encryptData(byte[] data, OutputStream out) throws
+            GeneralSecurityException, IOException {
         Key key = retrievePublicKey();
         Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -84,7 +91,14 @@ public class RSAHardwareEncryptor {
         }
     }
 
-    public byte[] decryptData(InputStream in) throws GeneralSecurityException, IOException {
+    /**
+     * Return decrypted data from the received cipher text blob.
+     *
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public byte[] decryptData(InputStream in) throws
+            GeneralSecurityException, IOException {
         Key key = retrievePrivateKey();
         Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -97,7 +111,8 @@ public class RSAHardwareEncryptor {
         return readFile(in).getBytes();
     }
 
-    public Key retrievePublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public Key retrievePublicKey() throws
+            NoSuchAlgorithmException, InvalidKeySpecException {
         String encodedKey = mPublicKeyStore.getString(KEY_PUBLIC, null);
         if (encodedKey == null) {
             throw new RuntimeException("Expected valid public key!");
@@ -108,7 +123,8 @@ public class RSAHardwareEncryptor {
                         .generatePublic(new X509EncodedKeySpec(publicKey));
     }
 
-    public Key retrievePrivateKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableEntryException {
+    public Key retrievePrivateKey() throws
+            GeneralSecurityException, IOException {
         KeyStore ks = KeyStore.getInstance(PROVIDER_NAME);
         ks.load(null);
         KeyStore.Entry entry = ks.getEntry(KEY_ALIAS, null);
@@ -120,7 +136,8 @@ public class RSAHardwareEncryptor {
         return ((KeyStore.PrivateKeyEntry) entry).getPrivateKey();
     }
 
-    private void generatePrivateKey(Context context) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    private void generatePrivateKey(Context context) throws
+            GeneralSecurityException {
         Calendar cal = Calendar.getInstance();
         Date now = cal.getTime();
         cal.add(Calendar.YEAR, 1);
