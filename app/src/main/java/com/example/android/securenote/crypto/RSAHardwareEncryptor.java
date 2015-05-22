@@ -46,9 +46,12 @@ public class RSAHardwareEncryptor {
     private static final String KEY_ALGORITHM = "RSA";
     private static final String ENCRYPTION_ALGORITHM = "RSA/ECB/PKCS1Padding";
 
+    //Preferences alias for the public key
     private static final String KEY_PUBLIC = "publickey";
+    //KeyStore alias for the private key
     private static final String KEY_ALIAS = "secureKeyAlias";
 
+    //Persistent location where we will save the public key
     private SharedPreferences mPublicKeyStore;
 
     public RSAHardwareEncryptor(Context context) {
@@ -67,75 +70,11 @@ public class RSAHardwareEncryptor {
     }
 
     /**
-     * Return a cipher text blob of encrypted data, Base64 encoded.
+     * Create a self-signed certificate and private key in hardware storage.
+     * Persist the (non-secret) public key into SharedPreferences.
      *
      * @throws GeneralSecurityException
-     * @throws IOException
      */
-    public void encryptData(byte[] data, OutputStream out) throws
-            GeneralSecurityException, IOException {
-        Key key = retrievePublicKey();
-        Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-
-        //Encode output to file
-        out = new Base64OutputStream(out, Base64.NO_WRAP);
-        //Encrypt output to encoder
-        out = new CipherOutputStream(out, cipher);
-
-        try {
-            out.write(data);
-            out.flush();
-        } finally {
-            out.close();
-        }
-    }
-
-    /**
-     * Return decrypted data from the received cipher text blob.
-     *
-     * @throws GeneralSecurityException
-     * @throws IOException
-     */
-    public byte[] decryptData(InputStream in) throws
-            GeneralSecurityException, IOException {
-        Key key = retrievePrivateKey();
-        Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, key);
-
-        //Decode input from file
-        in = new Base64InputStream(in, Base64.NO_WRAP);
-        //Decrypt input from decoder
-        in = new CipherInputStream(in, cipher);
-
-        return readFile(in).getBytes();
-    }
-
-    public Key retrievePublicKey() throws
-            NoSuchAlgorithmException, InvalidKeySpecException {
-        String encodedKey = mPublicKeyStore.getString(KEY_PUBLIC, null);
-        if (encodedKey == null) {
-            throw new RuntimeException("Expected valid public key!");
-        }
-
-        byte[] publicKey = Base64.decode(encodedKey, Base64.NO_WRAP);
-        return KeyFactory.getInstance(KEY_ALGORITHM)
-                        .generatePublic(new X509EncodedKeySpec(publicKey));
-    }
-
-    public Key retrievePrivateKey() throws
-            GeneralSecurityException, IOException {
-        KeyStore ks = KeyStore.getInstance(PROVIDER_NAME);
-        ks.load(null);
-        KeyStore.Entry entry = ks.getEntry(KEY_ALIAS, null);
-        if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
-            Log.w(TAG, "Not an instance of a PrivateKeyEntry");
-            return null;
-        }
-
-        return ((KeyStore.PrivateKeyEntry) entry).getPrivateKey();
-    }
-
     private void generatePrivateKey(Context context) throws
             GeneralSecurityException {
         Calendar cal = Calendar.getInstance();
@@ -161,6 +100,66 @@ public class RSAHardwareEncryptor {
         mPublicKeyStore.edit().putString(KEY_PUBLIC, encodedKey).apply();
     }
 
+    /**
+     * Return a cipher text blob of encrypted data, Base64 encoded.
+     *
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public void encryptData(byte[] data, OutputStream out) throws
+            GeneralSecurityException, IOException {
+        /*
+         * TODO: Encryption Lab:
+         * Obtain the public key for encryption
+         * Create and init a Cipher (with ENCRYPTION_ALGORITHM)
+         * Wrap the supplied stream in another provides Base64 encoding
+         * Wrap the encoding stream in another that encrypts with cipher
+         * Write the supplied data to the streams.
+         */
+    }
+
+    /**
+     * Return decrypted data from the received cipher text blob.
+     *
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public byte[] decryptData(InputStream in) throws
+            GeneralSecurityException, IOException {
+        /*
+         * TODO: Encryption Lab:
+         * Obtain the private key for decryption
+         * Create and init a Cipher (with ENCRYPTION_ALGORITHM)
+         * Wrap the supplied stream in another parses Base64 encoding
+         * Wrap the encoding stream in another that decrypts with cipher
+         * Read the stream fully and return the decrypted bytes
+         */
+        return null;
+    }
+
+    public Key retrievePublicKey() throws
+            NoSuchAlgorithmException, InvalidKeySpecException {
+        /*
+         * TODO: Encryption Lab:
+         * Get the encoded key from SharedPreferences
+         * Decode the key (from Base64) to raw bytes
+         * Return a public key instance from the bytes using KeyFactory
+         */
+        return null;
+    }
+
+    public Key retrievePrivateKey() throws
+            GeneralSecurityException, IOException {
+        /*
+         * TODO: Encryption Lab:
+         * Obtain an instance of AndroidKeyStore and load it
+         * Get the private key alias and return the key
+         */
+        return null;
+    }
+
+
+    /* Helper method to parse a file stream into memory */
     private String readFile(InputStream in) throws IOException {
         InputStreamReader reader = new InputStreamReader(in);
         StringBuilder sb = new StringBuilder();

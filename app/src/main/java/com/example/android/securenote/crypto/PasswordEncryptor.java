@@ -29,6 +29,9 @@ public class PasswordEncryptor {
     private static final String ENCRYPTION_ALGORITHM = "AES/CBC/PKCS5Padding";
     private static final int KEY_LENGTH = 256;
     private static final int SALT_LENGTH = KEY_LENGTH / 8;
+
+    //Delimiter should be used between components of the ciphertext
+    // We chose '&' because is not part of the Base64 character set
     private static final String DELIMITER = "&";
 
     private SecureRandom mSecureRandom;
@@ -39,6 +42,22 @@ public class PasswordEncryptor {
     }
 
     /**
+     * Create a new symmetric key used in both encryption and decryption
+     *
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    private SecretKey generateSecretKey(char[] passphraseOrPin, byte[] salt) throws
+            NoSuchAlgorithmException, InvalidKeySpecException {
+        /*
+         * TODO: Encryption Lab:
+         * Generate a new key from the supplied password+salt using AES.
+         * Use KEY_LENGTH for the length of the generated key.
+         */
+        return null;
+    }
+
+    /**
      * Return a cipher text blob of encrypted data, Base64 encoded.
      *
      * @throws GeneralSecurityException
@@ -46,30 +65,15 @@ public class PasswordEncryptor {
      */
     public void encryptData(String passphrase, byte[] data, OutputStream out) throws
             GeneralSecurityException, IOException {
-        Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
-
-        byte[] salt = new byte[SALT_LENGTH];
-        mSecureRandom.nextBytes(salt);
-
-        byte[] iv = new byte[cipher.getBlockSize()];
-        mSecureRandom.nextBytes(iv);
-
-        Key key = generateSecretKey(passphrase.toCharArray(), salt);
-        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
-
-        //Pack the result in a cipher text blob
-        final byte[] encrypted = cipher.doFinal(data);
-        try {
-            out.write(Base64.encode(salt, Base64.NO_WRAP));
-            out.write(DELIMITER.getBytes());
-            out.write(Base64.encode(iv, Base64.NO_WRAP));
-            out.write(DELIMITER.getBytes());
-            out.write(Base64.encode(encrypted, Base64.NO_WRAP));
-
-            out.flush();
-        } finally {
-            out.close();
-        }
+        /*
+         * TODO: Encryption Lab:
+         * Use SecureRandom to generate a new salt, length=SALT_LENGTH
+         * Use SecureRandom to generate a new iv, length=getBlockSize()
+         * Create and use a cipher to encrypt the incoming data (ENCRYPTION_ALGORITHM is already set).
+         * Pack and write all three (salt,iv,encrypted) as a ciphertext blob to the provided stream.
+         * - Each item should have a DELIMITER between it
+         * Don't forget to Base64 encode everything you write to the file
+         */
     }
 
     /**
@@ -80,40 +84,16 @@ public class PasswordEncryptor {
      */
     public byte[] decryptData(String passphrase, InputStream in) throws
             GeneralSecurityException, IOException {
-        //Unpack cipherText
-        String cipherText = readFile(in);
-        String[] fields = cipherText.split(DELIMITER);
-        if (fields.length != 3) {
-            throw new IllegalArgumentException("Not a valid cipher text blob");
-        }
-
-        final byte[] salt = Base64.decode(fields[0], Base64.NO_WRAP);
-        final byte[] iv = Base64.decode(fields[1], Base64.NO_WRAP);
-        final byte[] encrypted = Base64.decode(fields[2], Base64.NO_WRAP);
-
-        Key key = generateSecretKey(passphrase.toCharArray(), salt);
-        Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
-
-        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
-
-        return cipher.doFinal(encrypted);
+        /*
+         * TODO: Encryption Lab:
+         * Parse the ciphertext blob and unpack the stored iv, salt, and encrypted contents.
+         * Construct and use a Cipher to decrypt the data.
+         * Return the decrypted bytes.
+         */
+        return null;
     }
 
-    private SecretKey generateSecretKey(char[] passphraseOrPin, byte[] salt) throws
-            NoSuchAlgorithmException, InvalidKeySpecException {
-        // Number of PBKDF2 hardening rounds to use. Larger values increase
-        // computation time. You should select a value that causes computation
-        // to take >100ms.
-        final int iterations = 1000;
-
-        SecretKeyFactory secretKeyFactory =
-                SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        KeySpec keySpec =
-                new PBEKeySpec(passphraseOrPin, salt, iterations, KEY_LENGTH);
-        byte[] keyBytes = secretKeyFactory.generateSecret(keySpec).getEncoded();
-        return new SecretKeySpec(keyBytes, "AES");
-    }
-
+    /* Helper method to parse a file stream into memory */
     private String readFile(InputStream in) throws IOException {
         InputStreamReader reader = new InputStreamReader(in);
         StringBuilder sb = new StringBuilder();
