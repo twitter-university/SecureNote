@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         applicationId "com.example.android.securenote"
-        minSdkVersion 18
-        targetSdkVersion 22
+        minSdkVersion 19
+        targetSdkVersion 27
     }
 
     buildTypes {
