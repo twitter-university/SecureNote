@@ -1,0 +1,3611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.8">
+<title>Secure Application Storage</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+/*
+  pygmentize filter
+*/
+.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f4f4f4; }
+.highlight .c { color: #008800; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #AA22FF; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #008800; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #008800 } /* Comment.Preproc */
+.highlight .c1 { color: #008800; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #008800; font-weight: bold } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #808080 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0040D0 } /* Generic.Traceback */
+.highlight .kc { color: #AA22FF; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #AA22FF; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #AA22FF; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #AA22FF } /* Keyword.Pseudo */
+.highlight .kr { color: #AA22FF; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #00BB00; font-weight: bold } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BB4444 } /* Literal.String */
+.highlight .na { color: #BB4444 } /* Name.Attribute */
+.highlight .nb { color: #AA22FF } /* Name.Builtin */
+.highlight .nc { color: #0000FF } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #00A000 } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #B8860B } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BB4444 } /* Literal.String.Backtick */
+.highlight .sc { color: #BB4444 } /* Literal.String.Char */
+.highlight .sd { color: #BB4444; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BB4444 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BB4444 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BB4444 } /* Literal.String.Single */
+.highlight .ss { color: #B8860B } /* Literal.String.Symbol */
+.highlight .bp { color: #AA22FF } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #B8860B } /* Name.Variable.Class */
+.highlight .vg { color: #B8860B } /* Name.Variable.Global */
+.highlight .vi { color: #B8860B } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install(2);
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Secure Application Storage</h1>
+<div id="toc">
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>Objective: By the end of this module, you will be able<br>
+protect data saved on the file system and understand what to persist.</p></div>
+<div class="paragraph"><p></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_review_questions">1. Review Questions</h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Name three of the primary APIs for persisting data in Android.
+</p>
+</li>
+<li>
+<p>
+Why is it a bad idea hard-code secret keys in your application code?
+</p>
+</li>
+<li>
+<p>
+What is the preferred method of generating a unique ID for your application user?
+</p>
+</li>
+<li>
+<p>
+what is the one type of persisted data that cannot be (directly) encrypted?
+</p>
+</li>
+<li>
+<p>
+What is the name of the package that provides encryption for SQLite?
+</p>
+</li>
+<li>
+<p>
+What is the primary advantage of the accounts framework?
+</p>
+</li>
+<li>
+<p>
+Is password-based encryption symmetric or asymmetric? What does that mean?
+</p>
+</li>
+<li>
+<p>
+What is the difference between the system KeyChain and the system KeyStore?
+</p>
+</li>
+<li>
+<p>
+When is it safe to persist an encryption key in the system KeyStore?
+</p>
+</li>
+<li>
+<p>
+How do we check if the device supports this?
+</p>
+</li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_storage">2. Storage</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Improper storage of data is a simple problem to resolve, if handled from the start
+</p>
+</li>
+<li>
+<p>
+Mobile devices are different than traditional computing systems
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Physical device access is <strong>easy</strong> to achieve
+</p>
+</li>
+<li>
+<p>
+Once physical access is available, device can be rooted, flashed, etc.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+You <em>must</em> assume that once data is <strong>stored</strong> on the device it is vulnerable!
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+For typical users, this is usually not a problem
+</p>
+</li>
+<li>
+<p>
+Malicious users are <strong>not</strong> typical users!
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Once a device has been rooted, re-ROM&#8217;d, etc. the malicious user can read/write anywhere they want
+</p>
+<div class="paragraph"><p><em>The question to ask: what does my app really need to store?</em></p></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+The general rule of thumb: store only what you <em>absolutely require</em>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+This can mean many things: tokens/keys to access APIs, user credentials, authentication tokens
+</p>
+</li>
+<li>
+<p>
+It boils down to propery managing sensitive data
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+If you must store sensitive data, have a plan to do so in a way with minimized risk
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_storage_apis">3. Storage APIs</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+File access
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">Context</span> provides a number of helper APIs
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">Context.openFileInput()</span> opens a private file for reading
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">Context.openFileOutput()</span> opens a private file for writing
+</p>
+</li>
+<li>
+<p>
+Private files are tied to the app package, located in its private sandbox
+</p>
+</li>
+<li>
+<p>
+There are additional APIs for cache files
+</p>
+</li>
+<li>
+<p>
+"External storage" is also available, with a package private area
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Standard Java <span class="monospaced">File</span> class and related APIs available
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">Context</span> provides APIs to help get package private paths (<span class="monospaced">getDir()</span>, <span class="monospaced">getCacheDir()</span>, <span class="monospaced">getExternalCacheDir()</span>, <span class="monospaced">getExternalFilesDir()</span>, <span class="monospaced">getFilesDir()</span>)
+</p>
+</li>
+<li>
+<p>
+Apps should not assume any specific filesystem paths or mount points
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Opaque Binary Blobs (OBB)
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+App specific file container
+</p>
+</li>
+<li>
+<p>
+Can be encrypted
+</p>
+</li>
+<li>
+<p>
+App manages the download / mount of the containers
+</p>
+</li>
+<li>
+<p>
+Useful for large data sets (graphics, assets)
+</p>
+</li>
+<li>
+<p>
+Use <span class="monospaced">StorageManager</span> to mount then access
+</p>
+</li>
+<li>
+<p>
+Cannot <strong>create</strong> new OBBs on the device, just access existing ones
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<span class="monospaced">SharedPreferences</span>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+File backed storage of key-value pair data
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Keys are <span class="monospaced">String</span> objects, values can be primitives, <span class="monospaced">String</span> or <span class="monospaced">Set&lt;String&gt;</span>
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+App controls what data is stored and meaning
+</p>
+</li>
+<li>
+<p>
+Default for the app is tied to the package name
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Default name can be overridden
+</p>
+</li>
+<li>
+<p>
+Can use multiple <span class="monospaced">SharedPreferences</span> for the same app
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Data is not encrypted, simple string based lookup
+</p>
+</li>
+<li>
+<p>
+Can be used by multiple threads (clients), modifications go through <span class="monospaced">SharedPreferences.Editor</span>
+</p>
+</li>
+<li>
+<p>
+Does not support multi-process access
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+SQLite Databases
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+SQLite databases can be used for app specific storage
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Accessible to any component in your app, but (generally) not outside your app
+</p>
+</li>
+<li>
+<p>
+Backed by private file within the sandbox
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Recommended use is via <span class="monospaced">SQLiteOpenHelper</span> class to help manage creation, updates
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Use <span class="monospaced">SQLiteOpenHelper.getWriteableDatabase()</span> and <span class="monospaced">SQLiteOpenHelper.getReadableDatabase()</span> to get a <span class="monospaced">SQLiteDatabase</span> object to call <span class="monospaced">query()</span>, etc. against
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">query()</span> calls return <span class="monospaced">Cursor</span> objects which points to the rows found by the query
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_user_authentication">4. User Authentication</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+User authentication is used for access to user specific data in the app
+</p>
+</li>
+<li>
+<p>
+Best Practices for storage depends on app and credentials
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+BP#1: Certificate/key based credentials
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Leverage Android&#8217;s credential storage to securely track
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+See <a href="http://developer.android.com/reference/android/security/KeyChain.html"><span class="monospaced">KeyChain</span></a>
+and <a href="https://developer.android.com/training/articles/keystore.html"><span class="monospaced">AndroidKeyStore</span></a> provider
+with <a href="http://developer.android.com/reference/java/security/KeyStore.html"><span class="monospaced">KeyStore</span></a> (Android 4.3 and newer)
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<em>DO NOT</em> assume filesystem sandbox is enough
+</p>
+</li>
+<li>
+<p>
+Still can be vulnerable to attacks if device compromised
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+BP#2: User account credentials
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Users have numerous accounts for different service (Google, PayPal, Facebook, etc.)
+</p>
+</li>
+<li>
+<p>
+Leverage <a href="https://developer.android.com/reference/android/accounts/AccountManager.html"><span class="monospaced">AccountManager</span></a>
+for storage of accounts and accessing accounts
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">AccountManager</span> uses plugabble architecture for authenticators
+</p>
+</li>
+<li>
+<p>
+Using an existing account, apps can request authentication token for use in requests
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<em>DO NOT</em> assume filesystem sandbox is enough and store in cleartext
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+BP#3: Use WebView and Session Tokens
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Present the user with web page for login
+</p>
+</li>
+<li>
+<p>
+<em>DO NOT</em> store the user credentials at all
+</p>
+</li>
+<li>
+<p>
+The web interface presents a redirect with session token on success (e.g. <a href="http://en.wikipedia.org/wiki/OAuth">OAuth 2.0</a>)
+</p>
+</li>
+<li>
+<p>
+Keep the session token for subsequent requests
+</p>
+</li>
+<li>
+<p>
+Session key can be stored, but carefully do so
+</p>
+</li>
+<li>
+<p>
+This relies on the <em>server</em> to properly handle credentials, expire and rotate tokens correctly
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_session_identifiers">5. Session Identifiers</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Many network services (Google, Facebook, Instagram, etc.) use session or token based identifiers for access
+</p>
+</li>
+<li>
+<p>
+These can be stored on the device, carefully
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Be sure to store them in a way so an attacker cannot determine how it is used
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Servers should have reasonable expiration times for session IDs
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Some server implementations may issue new session IDs to replace old ones frequently
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Android&#8217;s <span class="monospaced">AccountManager</span> can be leveraged with 3rd party authenticators to help with auth tokens or sessions
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+It is up <em>to the app</em> to notify the <span class="monospaced">AccountManager</span> if a token is no longer valid
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hardcoded_tokens_and_keys">6. Hardcoded Tokens and Keys</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Best practice is to <strong>not</strong> use hardcoded values in code
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Java (including Dalvik DEX) can be disassembled <a href="http://dedexer.sourceforge.net/"><em>very easily</em></a>
+</p>
+</li>
+<li>
+<p>
+Reverse engineering can discover hardcoded values relatively easily
+</p>
+</li>
+<li>
+<p>
+This is <em>particularly bad for encryption of data</em>
+</p>
+</li>
+<li>
+<p>
+Best Practice: hash a random salt plus and password to create a key (with numerous iterations), store the salt and hash
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Some cloud services require an app authentication token
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+You have no choice but to store or hard code
+</p>
+</li>
+<li>
+<p>
+Best practice: ensure the server only uses this to "authenticate" the app, not the user
+</p>
+</li>
+<li>
+<p>
+Best practice on the server: only allow a limited subset of functionality via the app (e.g. no account delete or other more volatile ops)
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_unique_identifiers">7. Unique Identifiers</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Use of unique IDs is common for apps to track users or installs
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Typically used for analytics, ads, etc.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+A common practice uses <span class="monospaced">TelephonyManager.getDeviceId()</span>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<em>DO NOT</em> do this!  There are better ways.
+</p>
+</li>
+<li>
+<p>
+It requires the permission <span class="monospaced">READ_PHONE_STATE</span> which can set up a red flag to users
+</p>
+</li>
+<li>
+<p>
+It is not reliable.  Some devices do not report unique IDs or change IDs after factory reset
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Best Practice: for non-physical device tracking use
+<a href="https://developer.android.com/reference/java/util/UUID.html#randomUUID()"><span class="monospaced">UUID.randomUUID()</span></a>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+If you must track physical devices, use
+<a href="https://developer.android.com/reference/android/provider/Settings.Secure.html#ANDROID_ID"><span class="monospaced">Settings.Secure.ANDROID_ID</span></a>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+This is a 64 bit value created and stored when the device first boots.  It is wiped at factory reset.
+</p>
+</li>
+<li>
+<p>
+The downside to this is it is unreliable before Android 2.3 (Gingerbread) due to <span class="monospaced">SecureRandom</span>
+used to create <span class="monospaced">ANDROID_ID</span> being <a href="https://code.google.com/p/android/issues/detail?id=10639">seeded incorrectly</a>.
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+See this <a href="http://android-developers.blogspot.com/2011/03/identifying-app-installations.html">Google Developer Blog</a> for more details
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_storing_sensitive_data">8. Storing sensitive data</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Sometimes, you just have to do it: save your app&#8217;s (or user&#8217;s) sensitive data
+</p>
+</li>
+<li>
+<p>
+As we have seen, there are multiple ways of storing data, so how do you protect it?
+</p>
+</li>
+<li>
+<p>
+It depends on the storage type
+</p>
+</li>
+</ul></div>
+<table class="tableblock frame-topbot grid-all"
+style="
+width:75%;
+">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top" > Storage Type      </th>
+<th class="tableblock halign-left valign-top" > Private to App? </th>
+<th class="tableblock halign-left valign-top" > Can be made public? </th>
+<th class="tableblock halign-left valign-top" > Encryptable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Files</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes<sup>*</sup></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">OBB</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">SharedPreferences</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes<sup>*</sup></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">SQLite database</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes<sup>*</sup></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes<sup>**</sup></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes<sup>+</sup></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">ContentProvider</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Can be</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Yes</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph"><p><sup>*</sup> The default setting is to be private, this can be overridden</p></div>
+<div class="paragraph"><p><sup>**</sup> Making the database public can be done via file permissions or by exposing via <span class="monospaced">ContentProvider</span></p></div>
+<div class="paragraph"><p><sup>+</sup> SQLite databases can be encrypted using 3rd party libraries</p></div>
+<div class="sect2">
+<h3 id="_file_usage">8.1. File Usage</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Regular file usage is simple, well understood and fairly robust
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">SharedPreferences</span> are backed by files, so the same concepts apply (except for encryption)
+</p>
+</li>
+<li>
+<p>
+<em>Inherently insecure at runtime or if device physically compromised</em>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Data is "raw" or in the clear
+</p>
+</li>
+<li>
+<p>
+App sandbox works for basic protection
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Easy to override
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+External storage can present issues, if removable
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+For simple data (not critical if exposed), basic <span class="monospaced">File</span> access is ok
+</p>
+</li>
+<li>
+<p>
+Best Practice for sensitive data: use encryption (file only, not <span class="monospaced">SharedPreferences</span>) with user provided password
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+No "encrypt file" direct API available, but <span class="monospaced">javax.crypto</span> package can be used
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Use a <a href="http://developer.android.com/reference/javax/crypto/Cipher.html"><span class="monospaced">Cipher</span></a> initilized for AES/CBC/PKCS5Padding,
+create an initialization vector (IV) using <a href="http://developer.android.com/reference/java/security/SecureRandom.html"><span class="monospaced">SecureRandom</span></a>,
+save the raw IV at the start of the file, then use
+<a href="http://developer.android.com/reference/javax/crypto/CipherOutputStream.html"><span class="monospaced">CipherOutputStream</span></a> to write
+the encrypted data to the file.  Use the password to <em>derive</em> a key (don&#8217;t store the password!) using PBKDF2.
+</p>
+</li>
+<li>
+<p>
+To ensure integrity of the crypted file, create a secure checksum with MAC or HMAC (i.e. SHA-1)
+</p>
+</li>
+<li>
+<p>
+Obviously, this is not simple, can be prone to error
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_sqlite_databases">8.2. SQLite Databases</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+SQLite databases are used frequently in Android
+</p>
+</li>
+<li>
+<p>
+Each database is backed by a file
+</p>
+</li>
+<li>
+<p>
+<em>Inherently insecure at runtime or if device physically compromised</em>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+App sandbox works for basic protection
+</p>
+</li>
+<li>
+<p>
+Easy to override
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+For simple data (i.e. no user details, password hashes, etc.) basic usage is ok
+</p>
+</li>
+<li>
+<p>
+Best Practice for permissions: don&#8217;t override sandbox settings
+</p>
+</li>
+<li>
+<p>
+Best Practice for location: don&#8217;t use external (removable) storage
+</p>
+</li>
+<li>
+<p>
+Best Practice for sensitive data: use encryption (SQLCipher)
+</p>
+</li>
+</ul></div>
+<div class="sect3">
+<h4 id="_sqlcipher">8.2.1. SQLCipher</h4>
+<div class="ulist"><ul>
+<li>
+<p>
+Crypto library for SQLite databases, made by <a href="http://sqlcipher.net">Zetetic LLC</a>
+</p>
+</li>
+<li>
+<p>
+Encrypts 100% of the database, with a small amount of performance overhead (claims 5-15% overhead)
+</p>
+</li>
+<li>
+<p>
+Utilizes industry standard crypto libraries from OpenSSL, utlizes 256-bit AES encryption
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Encryption keys can be derived from a passphrase or using raw binary key data
+</p>
+</li>
+<li>
+<p>
+Key derivation is done using a 16 byte secure random salt (OpenSSL&#8217;s RAND_bytes)
+</p>
+</li>
+<li>
+<p>
+Each "page" in the database is encrypted separately
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Multi-platform and language support: Android, Linux, Mac OSX, iOS, and Windows with C/C++, Java, .NET, Ruby, PHP, Python
+</p>
+</li>
+<li>
+<p>
+Has both an open source (Community Edition) and commercial licensed versions
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Community Edition is available via BSD-style license
+</p>
+</li>
+<li>
+<p>
+Android Community Edition binaries are available free of charge at <a href="https://s3.amazonaws.com/sqlcipher/SQLCipher+for+Android+v3.1.0.zip">https://s3.amazonaws.com/sqlcipher/SQLCipher+for+Android+v3.1.0.zip</a>
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Basic Android walk-thru instructions (assumes Eclipse/ADT, not Android Studio) available <a href="http://sqlcipher.net/sqlcipher-for-android/">here</a>
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+In code, the major change is the import and use of <span class="monospaced">net.sqlite.database.SQLiteDatabase</span> rather than <span class="monospaced">android.database.sqlite.SQLiteDatabase</span>
+</p>
+<div class="listingblock">
+<div class="title">Sample SQLCipher Integration:</div>
+<div class="content"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.android.sqlsecure</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">net.sqlcipher.database.SQLiteDatabase</span><span class="o">;</span>
+<span class="err">…</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecureDbActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+    <span class="err">…</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span>  <span class="n">SECURE_DB_NAME</span> <span class="o">=</span> <span class="s">&quot;demo_secure.db&quot;</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">File</span>            <span class="n">mDbFile</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">SQLiteDatabase</span>  <span class="n">mDb</span><span class="o">;</span>
+    <span class="err">…</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">secure_db_layout</span><span class="o">);</span>
+        <span class="err">…</span>
+
+        <span class="c1">// Init SQLCipher *before* we make any SQLite calls</span>
+        <span class="n">SQLiteDatabase</span><span class="o">.</span><span class="na">loadLibs</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+        <span class="n">mDbFile</span> <span class="o">=</span> <span class="n">getDatabasePath</span><span class="o">(</span><span class="n">SECURE_DB_NAME</span><span class="o">);</span>
+        <span class="n">mDb</span> <span class="o">=</span> <span class="n">SQLiteDatabase</span><span class="o">.</span><span class="na">openOrCreateDatabase</span><span class="o">(</span><span class="n">mDbFile</span><span class="o">,</span> <span class="s">&quot;myFakePw&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="err">…</span>
+    <span class="o">}</span>
+
+    <span class="err">…</span>
+<span class="o">}</span>
+</pre></div></div></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_remembering_users_with_accounts">9. Remembering Users with Accounts</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Given the potential dangers around applications leaking persisted data on the file system, one option for storing user credentials is the <a href="https://developer.android.com/reference/android/accounts/AccountManager.html">Accounts Framework</a>.
+</p>
+</li>
+<li>
+<p>
+Accounts allow the system to manage access to credentials and authorization tokens for web services.
+</p>
+</li>
+<li>
+<p>
+This presents two useful options to application developers:
+</p>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Use an existing account on the system (like the user&#8217;s Google account) rather than inventing your own.
+</p>
+</li>
+<li>
+<p>
+Add your own account authentication logic (via a custom <span class="monospaced">AccountAuthenticator</span>) to the framework to get the credentials storage out of the application space.
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+The following is an example of how an application can use the <span class="monospaced">AccountManager</span> service to authenticate a user using their Google account:
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon note">
+</td>
+<td class="content">The following method will work for accounts from any active service (e.g. Twitter, Facebook, Microsoft Exchange) that use the accounts framework. For Google accounts specifically, <a href="http://developer.android.com/google/auth/http-auth.html">Google Play Services</a> now provides a much simpler API.</td>
+</tr></table>
+</div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Accessing the accounts framework requires two permissions:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.GET_ACCOUNTS&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.USE_CREDENTIALS&quot;</span> <span class="nt">/&gt;</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+You can ask the user to choose a Google account for authentication:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">REQUEST_CODE_PICK_ACCOUNT</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">;</span>
+
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">pickUserAccount</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">String</span><span class="o">[]</span> <span class="n">accountTypes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span><span class="s">&quot;com.google&quot;</span><span class="o">};</span>
+    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">AccountManager</span><span class="o">.</span><span class="na">newChooseAccountIntent</span><span class="o">(</span>
+            <span class="kc">null</span><span class="o">,</span>          <span class="c1">// Currently selected account</span>
+            <span class="kc">null</span><span class="o">,</span>          <span class="c1">// List of allowed accounts</span>
+            <span class="n">accountTypes</span><span class="o">,</span>  <span class="c1">// Allowed account types</span>
+            <span class="kc">true</span><span class="o">,</span>          <span class="c1">// Show the picker UI</span>
+            <span class="kc">null</span><span class="o">,</span>
+            <span class="kc">null</span><span class="o">,</span>
+            <span class="kc">null</span><span class="o">,</span>
+            <span class="kc">null</span><span class="o">);</span>
+    <span class="n">startActivityForResult</span><span class="o">(</span><span class="n">intent</span><span class="o">,</span> <span class="n">REQUEST_CODE_PICK_ACCOUNT</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+Determine the name of the account they chose, then find the <span class="monospaced">Account</span> object that matches the selected name from the <span class="monospaced">AccountManager</span>:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onActivityResult</span><span class="o">(</span><span class="kt">int</span> <span class="n">requestCode</span><span class="o">,</span> <span class="kt">int</span> <span class="n">resultCode</span><span class="o">,</span>
+        <span class="n">Intent</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">requestCode</span> <span class="o">==</span> <span class="n">REQUEST_CODE_PICK_ACCOUNT</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Receiving a result from the AccountPicker</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">resultCode</span> <span class="o">==</span> <span class="n">RESULT_OK</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">accountName</span> <span class="o">=</span>
+                    <span class="n">data</span><span class="o">.</span><span class="na">getStringExtra</span><span class="o">(</span><span class="n">AccountManager</span><span class="o">.</span><span class="na">KEY_ACCOUNT_NAME</span><span class="o">);</span>
+
+            <span class="c1">//Find the matching account for the selected name</span>
+            <span class="n">AccountManager</span> <span class="n">accountManager</span> <span class="o">=</span> <span class="n">AccountManager</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+            <span class="n">Account</span><span class="o">[]</span> <span class="n">accounts</span> <span class="o">=</span>
+                    <span class="n">accountManager</span><span class="o">.</span><span class="na">getAccountsByType</span><span class="o">(</span><span class="s">&quot;com.google&quot;</span><span class="o">);</span>
+            <span class="k">for</span> <span class="o">(</span><span class="n">Account</span> <span class="n">account</span> <span class="o">:</span> <span class="n">accounts</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">account</span><span class="o">.</span><span class="na">name</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">accountName</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="c1">//Found a match, get an authentication token</span>
+                    <span class="n">getToken</span><span class="o">(</span><span class="n">account</span><span class="o">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="err">…</span>
+<span class="o">}</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+Using <span class="monospaced">AccountManager.getAuthToken()</span>, we can ask the accounts framework to asynchronously authorize the user:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">SCOPE</span> <span class="o">=</span>
+        <span class="s">&quot;oauth2:https://www.googleapis.com/auth/userinfo.profile&quot;</span><span class="o">;</span>
+<span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">REQUEST_CODE_AUTHORIZE</span> <span class="o">=</span> <span class="mi">1001</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">getToken</span><span class="o">(</span><span class="n">Account</span> <span class="n">selectedAccount</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">AccountManager</span> <span class="n">accountManager</span> <span class="o">=</span> <span class="n">AccountManager</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="n">accountManager</span><span class="o">.</span><span class="na">getAuthToken</span><span class="o">(</span>
+            <span class="n">selectedAccount</span><span class="o">,</span>  <span class="c1">// Selected account</span>
+            <span class="n">SCOPE</span><span class="o">,</span>            <span class="c1">// Auth scope</span>
+            <span class="kc">null</span><span class="o">,</span>             <span class="c1">// Auth options</span>
+            <span class="k">this</span><span class="o">,</span>             <span class="c1">// Host activity for auth UI</span>
+            <span class="n">mCallback</span><span class="o">,</span>        <span class="c1">// Auth token callback</span>
+            <span class="kc">null</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="c1">//Callback to handle auth token request results</span>
+<span class="kd">private</span> <span class="n">AccountManagerCallback</span><span class="o">&lt;</span><span class="n">Bundle</span><span class="o">&gt;</span> <span class="n">mCallback</span> <span class="o">=</span>
+        <span class="k">new</span> <span class="n">AccountManagerCallback</span><span class="o">&lt;</span><span class="n">Bundle</span><span class="o">&gt;()</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">(</span><span class="n">AccountManagerFuture</span><span class="o">&lt;</span><span class="n">Bundle</span><span class="o">&gt;</span> <span class="n">result</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Bundle</span> <span class="n">bundle</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">getResult</span><span class="o">();</span>
+
+        <span class="n">Intent</span> <span class="n">authIntent</span> <span class="o">=</span> <span class="o">(</span><span class="n">Intent</span><span class="o">)</span> <span class="n">bundle</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">AccountManager</span><span class="o">.</span><span class="na">KEY_INTENT</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">authIntent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">//Additional user authentication required first</span>
+            <span class="n">startActivityForResult</span><span class="o">(</span><span class="n">launch</span><span class="o">,</span> <span class="n">REQUEST_CODE_AUTHORIZE</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="c1">//We are authenticated with the service</span>
+            <span class="n">String</span> <span class="n">token</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">AccountManager</span><span class="o">.</span><span class="na">KEY_AUTHTOKEN</span><span class="o">);</span>
+
+            <span class="c1">//…Use this token to access web services…</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+</pre></div></div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+If the registered <span class="monospaced">AccountAuthenticator</span> needs the user to enter additional information, this will return an activity <span class="monospaced">Intent</span> you need to launch.
+</p>
+</li>
+<li>
+<p>
+Otherwise, the token will be returned in the callback <span class="monospaced">Bundle</span>.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+You can now use this token to access this service&#8217;s APIs, or your own.
+</p>
+</li>
+</ol></div>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_encryption">10. Encryption</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Enhanced privacy and integrity of data (beyond the application sandbox) can be achieved using encryption
+</p>
+</li>
+<li>
+<p>
+On-device data encryption is usually done via Java Cryptography Extension (JCE)
+</p>
+</li>
+<li>
+<p>
+The <em>key</em> to secure on-device encryption is not storing the decryption keys on the file system
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+If the file system is compromised (e.g. rooted) the keys are just as easy to obtain as the data
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+The chosen method of encryption should rely on information that cannot be obtained by dumping <span class="monospaced">/data</span>
+</p>
+</li>
+<li>
+<p>
+The workhorse of encryption/decryption is the <a href="https://developer.android.com/reference/javax/crypto/Cipher.html"><span class="monospaced">Cipher</span></a>:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+To encrypt to a byte array:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kt">byte</span><span class="o">[]</span> <span class="n">plainText</span> <span class="o">=</span> <span class="c1">// some plain text</span>
+<span class="n">Key</span> <span class="n">key</span> <span class="o">=</span> <span class="c1">// derived key for chosen algorithm</span>
+<span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">ENCRYPTION_ALGORITHM</span><span class="o">);</span>
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">ENCRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">encrypted</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">plainText</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+To decrypt the same byte array:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kt">byte</span><span class="o">[]</span> <span class="n">encrypted</span> <span class="o">=</span> <span class="c1">// read encrypted buffer from somewhere</span>
+<span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">ENCRYPTION_ALGORITHM</span><span class="o">);</span>
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">DECRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">plainText</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">encrypted</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+To avoid keeping large blocks of data in memory, there&#8217;s <span class="monospaced">CipherInputStream</span> and <span class="monospaced">CipherOutputStream</span>:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+To encrypt to a file/stream:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kt">byte</span><span class="o">[]</span> <span class="n">plainText</span> <span class="o">=</span> <span class="c1">// some plain text</span>
+<span class="n">Key</span> <span class="n">key</span> <span class="o">=</span> <span class="c1">// derived key for chosen algorithm</span>
+<span class="n">OutputStream</span> <span class="n">out</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileOutputStream</span><span class="o">(</span><span class="s">&quot;some-file&quot;</span><span class="o">);</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">ENCRYPTION_ALGORITHM</span><span class="o">);</span>
+    <span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">ENCRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CipherOutputStream</span><span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">cipher</span><span class="o">);</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">plainText</span><span class="o">);</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">flush</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+To decrypt the same file/stream:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="n">InputStream</span> <span class="n">in</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">FileInputStream</span><span class="o">(</span><span class="s">&quot;some-file&quot;</span><span class="o">);</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">ENCRYPTION_ALGORITHM</span><span class="o">);</span>
+    <span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">DECRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+    <span class="n">in</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CipherInputStream</span><span class="o">(</span><span class="n">in</span><span class="o">,</span> <span class="n">cipher</span><span class="o">);</span>
+    <span class="n">in</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">plainText</span><span class="o">);</span> <span class="c1">// do properly</span>
+<span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+    <span class="n">in</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div></div></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="sect2">
+<h3 id="_password_based_encryption">10.1. Password Based Encryption</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+One secure method for encrypting data is to rely on a user-entered password to derive the encryption key.
+</p>
+</li>
+<li>
+<p>
+This type of encryption pairs well with the <a href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard">Advanced Encryption Standard</a> (AES) cipher algorithm.
+</p>
+</li>
+<li>
+<p>
+AES is a <em>symmetric-key algorithm</em>, meaning it uses the same key to encrypt/decrypt data.
+</p>
+</li>
+<li>
+<p>
+Advantage: Key is not stored anywhere an attacker can search without "shoulder surfing"
+</p>
+</li>
+<li>
+<p>
+Disadvantage: Requires asking user for passcode repeatedly, or caching in memory (reducing the security factor).
+</p>
+</li>
+<li>
+<p>
+We can use the following steps to derive a password-based key:
+</p>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Android only supports the "PBKDF2WithHmacSHA1" key derivation algorithm, which requires a random <em>salt</em> to apply to the password (to reduce brute-force capabilities).
+</p>
+</li>
+<li>
+<p>
+The Cipher Block Chaining (CBC) mode is well-supported for AES on Android, which also requires a random <em>initialization vector</em> for encryption.
+</p>
+</li>
+<li>
+<p>
+We can generate all the necessary bits with the help of <a href="https://developer.android.com/reference/java/security/SecureRandom.html"><span class="monospaced">SecureRandom</span></a>:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;AES/CBC/PKCS5Padding&quot;</span><span class="o">);</span>
+
+<span class="c1">// Do *not* seed secureRandom! Automatically seeded from system entropy.</span>
+<span class="n">SecureRandom</span> <span class="n">random</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SecureRandom</span><span class="o">();</span>
+
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">salt</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">32</span><span class="o">];</span>
+<span class="n">random</span><span class="o">.</span><span class="na">nextBytes</span><span class="o">(</span><span class="n">salt</span><span class="o">);</span>
+
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">iv</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">cipher</span><span class="o">.</span><span class="na">getBlockSize</span><span class="o">()];</span>
+<span class="n">random</span><span class="o">.</span><span class="na">nextBytes</span><span class="o">(</span><span class="n">iv</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+The <em>salt</em> will be necessary to derive the <span class="monospaced">SecretKey</span>:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kd">private</span> <span class="n">SecretKey</span> <span class="nf">generateSecretKey</span><span class="o">(</span><span class="kt">char</span><span class="o">[]</span> <span class="n">passphraseOrPin</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">salt</span><span class="o">)</span>
+        <span class="kd">throws</span> <span class="n">NoSuchAlgorithmException</span><span class="o">,</span> <span class="n">InvalidKeySpecException</span> <span class="o">{</span>
+    <span class="c1">// Number of PBKDF2 hardening rounds to use. Larger values increase</span>
+    <span class="c1">// computation time. You should select a value that causes computation</span>
+    <span class="c1">// to take &gt;100ms.</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">;</span>
+
+    <span class="n">SecretKeyFactory</span> <span class="n">secretKeyFactory</span> <span class="o">=</span>
+            <span class="n">SecretKeyFactory</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;PBKDF2WithHmacSHA1&quot;</span><span class="o">);</span>
+    <span class="n">KeySpec</span> <span class="n">keySpec</span> <span class="o">=</span>
+            <span class="k">new</span> <span class="n">PBEKeySpec</span><span class="o">(</span><span class="n">passphraseOrPin</span><span class="o">,</span> <span class="n">salt</span><span class="o">,</span> <span class="n">iterations</span><span class="o">,</span> <span class="n">KEY_LENGTH</span><span class="o">);</span>
+    <span class="kt">byte</span><span class="o">[]</span> <span class="n">keyBytes</span> <span class="o">=</span> <span class="n">secretKeyFactory</span><span class="o">.</span><span class="na">generateSecret</span><span class="o">(</span><span class="n">keySpec</span><span class="o">).</span><span class="na">getEncoded</span><span class="o">();</span>
+
+    <span class="k">return</span> <span class="k">new</span> <span class="n">SecretKeySpec</span><span class="o">(</span><span class="n">keyBytes</span><span class="o">,</span> <span class="s">&quot;AES&quot;</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div></div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon note">
+</td>
+<td class="content">See <a href="http://android-developers.blogspot.com/2013/02/using-cryptography-to-store-credentials.html">Using Cryptography to Store Credentials Safely</a></td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+This key is used to initialize the <span class="monospaced">Cipher</span> and encrypt some plain text into ciphertext:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="n">String</span> <span class="n">passphrase</span> <span class="o">=</span> <span class="c1">// user entered password</span>
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">plainText</span> <span class="o">=</span> <span class="c1">// some plain text</span>
+<span class="n">SecretKey</span> <span class="n">key</span> <span class="o">=</span> <span class="n">generateSecretKey</span><span class="o">(</span><span class="n">passphrase</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">(),</span> <span class="n">salt</span><span class="o">);</span>
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">ENCRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="k">new</span> <span class="n">IvParameterSpec</span><span class="o">(</span><span class="n">iv</span><span class="o">));</span>
+
+<span class="c1">//Pack the result in a cipher text blob</span>
+<span class="kd">final</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">encrypted</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">plainText</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+We can use the same process to decrypt the ciphertext data:
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon tip">
+</td>
+<td class="content">The same salt and initialization vector are required for decrypting the data, so they must be saved somewhere. These values are NOT secret, so it is safe to persist them.</td>
+</tr></table>
+</div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">salt</span> <span class="o">=</span> <span class="c1">// retrieve from encryption step</span>
+<span class="kd">final</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">iv</span> <span class="o">=</span> <span class="c1">// retrieve from encryption step</span>
+<span class="kd">final</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">encrypted</span> <span class="o">=</span> <span class="c1">// encrypted ciphertext</span>
+
+<span class="n">Key</span> <span class="n">key</span> <span class="o">=</span> <span class="n">generateSecretKey</span><span class="o">(</span><span class="n">passphrase</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">(),</span> <span class="n">salt</span><span class="o">);</span>
+<span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;AES/CBC/PKCS5Padding&quot;</span><span class="o">);</span>
+
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">DECRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="k">new</span> <span class="n">IvParameterSpec</span><span class="o">(</span><span class="n">iv</span><span class="o">));</span>
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">plainText</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">encrypted</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+For more details, see <a href="http://nelenkov.blogspot.com/2012/04/using-password-based-encryption-on.html">Using Password-based Encryption on Android</a>
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_keystore_and_keychain_api">10.2. Keystore and Keychain API</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Since Donut/1.6, Android has had a system-wide <span class="monospaced">keystore</span> for storage of VPN and (later) WiFi authentication keys
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+See <a href="http://www.google.com/support/mobile/bin/answer.py?hl=en&amp;answer=168466">Working with secure certificates</a>
+</p>
+</li>
+<li>
+<p>
+Pre ICS/4.0, applications were not able to access it, so those needing to authenticate via client certificates ended up maintained their own key store (hard to manage across apps)
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+In ICS/4.0, Android adds support for <a href="http://developer.android.com/reference/android/security/KeyChain.html"><span class="monospaced">android.security.KeyChain</span></a>, which provides apps with
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Access to private keys in the system key store and their corresponding certificate chains (subject to one-time user approval)
+</p>
+</li>
+<li>
+<p>
+Ability to initiate installation of credentials from X.509 certificates and PKCS#12 key stores (e.g. for installation of organization CA certs)
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Also, in ICS/4.0, Android uses the screen lock password to protect the system credential storage, which works well with device administration APIs and prevents the user from disabling the password as long as they use the secured credentials
+</p>
+</li>
+<li>
+<p>
+See <a href="http://android-developers.blogspot.com/2012/03/unifying-key-store-access-in-ics.html">Unifying Key Store Access in ICS</a>
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_encryption_using_hardware_backed_private_keys">10.3. Encryption Using Hardware-Backed Private Keys</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+On Android 4.3+, the hardware-backed <em>AndroidKeyStore</em> stores device-specific private keys.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+See <a href="https://developer.android.com/training/articles/keystore.html">Using Android Keystore Provider</a>
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+We can use these keys with the <a href="http://en.wikipedia.org/wiki/RSA_%28cryptosystem%29">RSA</a> cipher algorithm
+</p>
+</li>
+<li>
+<p>
+RSA is an <em>asymmetric-key algorithm</em>, meaning it uses a separate "public" key to encrypt data and a "private" key to decrypt it.
+</p>
+</li>
+<li>
+<p>
+RSA private keys are stored inside a secure hardware element.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Typically a Trusted Execution Environment (TEE) on the SoC.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">KeyChain.isBoundKeyAlgorithm()</span> will tell if other algorithms are also hardware-bound (and, therefore, non-exportable)
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Advantage: This approach doesn&#8217;t require user input (password)
+</p>
+</li>
+<li>
+<p>
+Disadvantage: Key generation is slow. Technically key is retrievable (though it would require dismantling the SoC)
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Here is an example of using a non-exportable key to encrypt a chunk of data:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+To encrypt data with a hardware-bound key, we first need to generate one for the application:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="c1">//Create key pair with self-signed certificate information</span>
+<span class="n">Calendar</span> <span class="n">cal</span> <span class="o">=</span> <span class="n">Calendar</span><span class="o">.</span><span class="na">getInstance</span><span class="o">();</span>
+<span class="n">Date</span> <span class="n">now</span> <span class="o">=</span> <span class="n">cal</span><span class="o">.</span><span class="na">getTime</span><span class="o">();</span>
+<span class="n">cal</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">Calendar</span><span class="o">.</span><span class="na">YEAR</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+<span class="n">Date</span> <span class="n">end</span> <span class="o">=</span> <span class="n">cal</span><span class="o">.</span><span class="na">getTime</span><span class="o">();</span>
+
+<span class="n">KeyPairGenerator</span> <span class="n">kpg</span> <span class="o">=</span> <span class="n">KeyPairGenerator</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;RSA&quot;</span><span class="o">,</span> <span class="s">&quot;AndroidKeyStore&quot;</span><span class="o">);</span>
+<span class="n">kpg</span><span class="o">.</span><span class="na">initialize</span><span class="o">(</span><span class="k">new</span> <span class="n">KeyPairGeneratorSpec</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">context</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setAlias</span><span class="o">(</span><span class="n">KEY_ALIAS</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setStartDate</span><span class="o">(</span><span class="n">now</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setEndDate</span><span class="o">(</span><span class="n">end</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setSerialNumber</span><span class="o">(</span><span class="n">BigInteger</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">1</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">setSubject</span><span class="o">(</span><span class="k">new</span> <span class="n">X500Principal</span><span class="o">(</span><span class="s">&quot;CN=&quot;</span> <span class="o">+</span> <span class="n">KEY_ALIAS</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">build</span><span class="o">());</span>
+
+<span class="c1">//Calling this also binds the private key to hardware</span>
+<span class="c1">// You could obtain it here with getPrivate(), if needed</span>
+<span class="n">KeyPair</span> <span class="n">kp</span> <span class="o">=</span> <span class="n">kpg</span><span class="o">.</span><span class="na">generateKeyPair</span><span class="o">();</span>
+
+<span class="c1">//Use public key to encrypt data</span>
+<span class="n">PublicKey</span> <span class="n">publicKey</span> <span class="o">=</span> <span class="n">kp</span><span class="o">.</span><span class="na">getPublic</span><span class="o">();</span>
+</pre></div></div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon note">
+</td>
+<td class="content">You only need to do this once, and persist the public key somewhere for re-use. Generating a hardware-bound key is expensive (many seconds).</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+Now we can pass the public key to a <span class="monospaced">Cipher</span>:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kt">byte</span><span class="o">[]</span> <span class="n">plainText</span> <span class="o">=</span> <span class="c1">// some plain text</span>
+<span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;RSA/ECB/PKCS1Padding&quot;</span><span class="o">);</span>
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">ENCRYPT_MODE</span><span class="o">,</span> <span class="n">publicKey</span><span class="o">);</span>
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">encrypted</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">plainText</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+To decrypt, we retrieve the private key from the keystore:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="n">KeyStore</span> <span class="n">ks</span> <span class="o">=</span> <span class="n">KeyStore</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;AndroidKeyStore&quot;</span><span class="o">);</span>
+<span class="n">ks</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+<span class="n">KeyStore</span><span class="o">.</span><span class="na">Entry</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">ks</span><span class="o">.</span><span class="na">getEntry</span><span class="o">(</span><span class="n">KEY_ALIAS</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+<span class="k">if</span> <span class="o">(!(</span><span class="n">entry</span> <span class="k">instanceof</span> <span class="n">KeyStore</span><span class="o">.</span><span class="na">PrivateKeyEntry</span><span class="o">))</span> <span class="o">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">KeyException</span><span class="o">(</span><span class="s">&quot;Not an instance of a PrivateKeyEntry&quot;</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">PrivateKey</span> <span class="n">privateKey</span> <span class="o">=</span> <span class="o">((</span><span class="n">KeyStore</span><span class="o">.</span><span class="na">PrivateKeyEntry</span><span class="o">)</span> <span class="n">entry</span><span class="o">).</span><span class="na">getPrivateKey</span><span class="o">();</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+The private key can then be passed to the decrypt <span class="monospaced">Cipher</span>:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kt">byte</span><span class="o">[]</span> <span class="n">encrypted</span> <span class="o">=</span> <span class="c1">// encrypted ciphertext</span>
+<span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;RSA/ECB/PKCS1Padding&quot;</span><span class="o">);</span>
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">DECRYPT_MODE</span><span class="o">,</span> <span class="n">privateKey</span><span class="o">);</span>
+
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">plainText</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">encrypted</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+</ol></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_lab_encrypting_file_data">11. Lab: Encrypting File Data</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+To begin, download and import the initial <em>SecureNote</em> application (if you are using our student VMs, you can skip this step and simply open the <span class="monospaced">SecureNote</span> project):
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Option #1: Clone separately and import:
+</p>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Download the code <a href="https://github.com/thenewcircle/SecureNote">from GitHub</a>:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+As a ZIP archive: <a href="https://github.com/thenewcircle/SecureNote/archive/master.zip">https://github.com/thenewcircle/SecureNote/archive/master.zip</a>
+</p>
+</li>
+<li>
+<p>
+On the command line: <span class="monospaced">git clone https://github.com/thenewcircle/SecureNote.git</span>
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Open Android Studio
+</p>
+</li>
+<li>
+<p>
+Select <em>Import project</em>
+</p>
+</li>
+<li>
+<p>
+Choose the root directory of the cloned project
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Option #2: Import directly from GitHub:
+</p>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Open Android Studio
+</p>
+</li>
+<li>
+<p>
+Select <em>Check out project from Version Control</em> &#8594; <em>Git</em>
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Enter "https://github.com/thenewcircle/SecureNote.git" as the URL
+</p>
+</li>
+<li>
+<p>
+Choose a destination directory on your machine (e.g. <span class="monospaced">~/StudioProjects</span>)
+</p>
+</li>
+<li>
+<p>
+Click <em>Clone</em>
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+After the clone is complete, select <em>Yes</em> to open the project
+</p>
+</li>
+<li>
+<p>
+Click <em>OK</em> to run the Import Wizard with the default options
+</p>
+</li>
+</ol></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>After importing, you will need to click File&#8594;Sync Project with Gradle Files</p></div>
+<div class="paragraph"><p>Once the project is imported and open, build and deploy it to a device/emulator. You should see a user interface that looks like this:</p></div>
+<div class="imageblock">
+<div class="content">
+<img alt="images/Lab-SecureNote.png"
+src="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAAWgAAAKACAYAAACxGuKnAAAAAXNSR0IArs4c6QAAAAlwSFlzAAAL
+EwAACxMBAJqcGAAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6
+eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYg
+eG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4K
+ICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlm
+Zj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRh
+dGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9y
+ZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAQABJREFUeAHsnQW8HsXVhyfuISQhQUKcBHfX4O5Q
+3KVIaZHiBVIoUOhHkVKkRUpxdynu7hogkARNQtw93z7n5lz2bt732t6FTfY/+b2yuzNnZp6d/c/Z
+s/PeNGrSpMncoCQCIiACIpA7Ak1z1yI1SAREIBcE5s6dG3jFU6NGjWzTP+PH0n6nrrrYnTNnTpUq
+KVuX8lUK53SjkTzonJ4ZNUsEfgUCiB5CGelCaN26tb2aNWtm+9g/derUMGXKlDB9+nRrHfnSJuqk
+jkUXXTSMGjXK6qpOaGlH06ZNQ5cuXULjxo0tP5/Tpk0LI0eOtH1p25SX8hLovJwJtUMEfkUCiCQi
+17Fjx7DIIouEmTNnhuHDh1cKcbxpSyyxRGjTpo0d++mnn+yzvt4r9bZs2dJeY8eOtWoQ69mzZ5f0
+hhFnjvsEEW8X35lUEOrqBD5ZJs/bEug8nx21TQQyJoDg8VpyySXNKx02bFiVGtddd92w+OKL2z6E
+74knnqhyvH379qFTp04BoZ40aZJ53lUyVLNBvc2bN7eJAa/8t7/9bXjyySfDkCFDbD8iHU9s4zXj
+PeNtDxgwoDIfoo33/OijjwbahCc+efLkWnnTtKOUoDN5kGo7+Xh+JrpSqabjpcpIoEtR0T4RKAAB
+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
+sW/06NFmr0+fPtYGvHsS24gisfSpU6faXYHXx+0LQs1+bMSTCzcTgE8OnTp1Cn/5y19sckIoPQ9t
+JmHH8/ox+ul3I26fCY0EExd5eO600062/5133rFPeMICW3VtvxnQmwiIQLUEuHaJNb/00kvhhhtu
+CIcffrjp1I033mj7sghx1FugudVGNEh4yaTBgweH1Vdf3b77G94dHh9C8+c//zmcc845YZ111gmE
+P0hbbbVVWHrppS12gzdIoqPYdm/ygw8+MJHeb7/9TNi5rX/uuedMiJZaaikTO/dSKYeYUxYBXGyx
+xULfvn3NWx45cqR56gjxKqusEvBuyX/IIYfY54svvhi6du1qDwBoB14qk9C3334bnnzySbNJPYh+
+XKQ95sQn+317k002sYnpvPPOCxtssAEmK48lyxOL9hi+1zt8+PDw6KOPWjn4uSfNxObizncS9jiO
+yPMAg+R2amq/ZdabCIhAjQR45tOvXz+LOf/3v/+1/Fxv7OOYX/s1GqplhnoLNA3BY8NbQwxJeIUk
+Zpkll1zSYqUPPfRQ6NWrV+D23G/jEWfCHog1QokNjg0cONBmJgLweMjsI4575ZVXhh133NFsIkjj
+x48PeI6nnHJKePfddwMP466++mqr9/HHHw977rmnTRpvvvmm2WMbkTr44IMD++6++24LCSC6Xbp0
+CRtuuKF5y4ggIk4sff/997d245lOmDDB7hROO+208Nprr1l99LXcyUAoaTtxZ+JTCLRPZqXK4Bkz
+WeBx09aePXvaRMQJp/+XX365hTGYzO6///7ApIQdXieddFI44ogjwqmnnhp8wBBOOuCAA+zOpT7t
+t5OoNxEQgWoJ+J1vtZlSHqy3QHM7z238999/H7777rvQo0cPE0gEGYHDwyX9+OOPFtrgO0KEUONN
+8uSze/fu5gny0AtbxFERacTsmmuuoUjg9gFhJY0bN85CAAgUIRWOIfBMFL4ighAHCQ+fxOoRvGBW
+kvhEwnf27bzzzhbiIB9iSrrgggtM+JkIEGYEu1u3bmHjjTcO//73v837x4NG+Ah5JBOiiXdLmGfA
+gAGhZyS23BngzZZLiDMifNxxx5noIswjRowwIV5rrbXCZZddZuEcQjHUCXvqJ/m2e9IXXnhh+OMf
+/2h9rU/7y7VR+0VABILpBmHZiy++2BwjmFx33XX5W8XB7OEChbggxIgGni4rORBoxA4PlbTGGmtY
+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
+lrZSL3mcDfVTlmPs9zrYjyAjzltvvXX48MMPA3cxnN9kG7zN+hQBEfj1CFSu4pgTCWqzaKnd2Jkz
+wtfjx4bHHrw/3H7bbWFMFKYgffPNN+H2228Pr7zySnjqqafCjz/+aBf/8OHDTZAXX3xx88wQcRcp
+91gRDpJv89338T2ZEBLEixDJxIkTQ+fOnW0ymDRpkgkP4RUEZYkllgjt2rULY8aMsTqx6RMDt/Dj
+x4+3ckwklGUb2+US5Wk/gte1a1crO2XKlGrLUQaxHDlypNmmXPv27U0IKUt93ia4wAsPlnzsp754
+Ij/9pr30m9fkyZNtn7edT/gQYqLuxRZbzOqhLYiy1wEfktfBcV6U9xcTnJIIiEA+CVRenUgo656b
+Rhdwy+ii7d5q0TClR5fQbN4FjEe4zDLLWHjCPTjEc6uttgorrLCCeYyI5g8//BCee+4581zxBOuS
+yI/QbbfddqF3797hiy++MG+vQ4cOZmbEiBHh6aeftpj2yiuvXFnnd999Z3UiiHiMCNeyyy4b1ltv
+veBlEezXX389fPrppybq9CGZyLPZZpuFFVdc0UIzHKePb731lnmbTAbxci7O9HunnXYyPggneRDF
+l156KdA2BJu2tW3bNmy//fYWFqKveLmff/55eP75560+RJNJhLj9aqutZu30NhDDx+OlDMzxgr/6
+6qvQr18/Cx/B5c033wxLLbWU8SP0RB3cCQwaNCg888wzJuRHHHGEtQch53yefPLJNum+//77xkqe
+dHJUaFsEfj0ClQJd0YSK9c94drOmToq80opYMccQHTxLLmCO48UiNmuuuaZ505999pnFmrnoEcl7
+773XyiBitU3kpQ7i1niFfOKp473jDS699NJht912M+FBrPGc2UdcGyG6//77rX2I1jbbbGP1I8gk
+BHvLLbe0iWPYsGHmxbrYImT0h4eXa6yxhnmgCCf9oNymm25qD9W+/fZbE0Mvh6BSbueddzZBRYzJ
+Q4ydNsAHDogudey4446BO40vv/zSPOJevXqFtdde29rMpIY3izAzSSDon3zyibGmf7QBD5w+Es+H
+DxMGkxFhC/IzidKHeB09e/a0Omjziy++aO3DKyesQbvgyCREX71ftT1fyicCIpAtgYRA11wZQoOn
+iQeHF0ss+uyzz7ZbbsT12GOPNZHBCyUkUheBpnZEzycBPMbrrrvObvOJox533HEm1AjNjTfeaJ7g
+kksuGY466ijzHPFQEZv111/f7Nx6663htddes04hznvuuacJMN4ieUm0j/oQPR5m0h9sf/3113Z8
+jz32CNtuu60J7gcffGDlyE878UIRSYQWoTznnHOsDG/HHHOMeeII4R133BGOPPLIQFsJEd1www0m
+2Issskg49dRTw0orrRTee+89azveM0J855132j4mno022ijsv//+5ln7JMQkiWf8r3/9ywSZc0Jb
+8aDx3OkDfWOSo12cD+q49tprbeJAuOnrNddcE1ZZZRUTaGwqiYAI5IdAnQWaix4xQDQQTW6zCXHg
+tRE7xYtEuNmuT3Lx45NwB54oHh+CiZfILT7fERxEllACDwIRWAQG4SE/oRY8ywEDBpgA8x2PEe8W
+IUZcEVnK8ELIHnjggYB3zV0A3i4eJfFi2kLowicb/6Q8Akq7iCkffPDBFrIgBowtJhjq6dGjh3ms
+5MN7JvSCt0s+7hCWX355azNiT0hmyJAh1sdVV13V2kAfCc/QBtpP/bRt6NChJvp40/SBycDrWHfd
+da3tiDD1cCfABEFeuJEfe4SS/GFjfc6XyoiACGRHoE4CjTBwYSNMiAnf8fh4kdgmDxc8glffFLeD
+wOFRuijySSiA/XjsbPsx8vkSPiYIPG4/hk3ahIdN2xF17gbYT3+whWARo0XoKOft8O/k9+Tl6Cvi
+ufHGG5vnToiEiQChx3vHLqJIPsIIv/nNbyptY4u+UL//8IfvPBQkL33kxeTz8ssvW17a6InvtIk6
+mHTY5rXXXntV6Xe8DsTeQxn0AQ58KomACOSPQJ0E2i/k+CfeHhc5whJPCAG38J43fqy2372sC6SX
+K7ef4xyjLXjfeI8II4LkQo2HiUfs4kwZjiGKeM2Ebohb452ykgKh33DDDS0P5eIJuwgpP8AZPHiw
+xeOJlXfp0sUeZCL0Dz/8cCUfOBHbjrOivbyIBeP5k7yt8e/kcWG1TNFbfJ/3sVwdHCdeTn8o5yle
+l+/TpwiIQD4I1EmgaTIXNBc4nigix0Mx1tIShyX8gDDj9XHr7N5s1l11wUGMCbOwTVuIrxKTdQHm
+GOJICMb7wTaiRj4Elf78/e9/t7ANq0jwjEslyuOxE5LYd999LaTyyCOPWJ8JexAPXn311a0u4uh4
+uYQ1HnvsMRN/wh60EWEm9YxCMxyHHR4+EwZ8qYeQEg9jmQyoI57oK/kI4Xgd5OHBarIO+o2n7rz4
+hBl1KImACOSPQFW3d772VYixX9BcyHhiLBvDY0SI+Bk3KxEQB8QFQePBF3FVxJoy8fJUwbbvS1bp
+YhE/Xu57vCx5CGEQn8Z7ZsLgVh8RRITxTo8//vhw0EEH2eQS92Kx4+1EJPk5OitE8KYJWSCA7nV7
+neRHoBFNHkqyysKX9BFXRlRpE2VJQyOPnNgvDyqJBXv5Aw44IJx44okWoqDteLmsTCFsxEM9Hkwi
+tKzsoF0IMQnb/qIvtI+7GeogjIIN6uAcHXjggVYHYsw5InGMcoRiOHdsK4mACOSLQDUedIUYE78k
+rsnFjDgjCsREEYN33nnHBJoVBoQTuMjxREksEUMcECiPlbJNQiiwi71kciEkD3VSH3bZTxn3+NhP
+4pP9vMhHXcRrWXmx+eab2xI8whrEgYnTsp4YkXJBog0IO+1HrHiY9tvf/rbygSICTF4mJa+PT8rh
+jcKBJYY8tGQFC5MD9liHjJjCgYeor776qj1IxD6xcY5RnnwIOvboG6s8WAfO0j08cPqHZ4+XT79I
+zsDcj1kAAEAASURBVAG2HKcsExAxb0IYyy23nLUFsY/XwYTCuaNuJi6W75111ln2K1HCOog7tpRE
+QATyQaBJdEEP5H9OmTN1WmjRuWPos+kmYdr4CWHwXXeHZksuHjp37GSCgHfHwy9EhIsYESIEgPgR
+ayacwcWPKPBLQ26x2YewIRKIHyEGbt+J0eKhIm4IoCeEENscR4SoE08U0WU/8V0+WQnh4s82HimC
+42uXESAEl/YgytSJl8jDPEQOT5dy8UR9eLnURX9oM21EWOkr/aRP7hF7WfLDAaGkLvpMn/wHOwg2
+7aA+8lGePLSBOtn3+OOP2wREPlZccOdBm/kFJO0gDPLss8/aChnKIcaUZQUNoab4pAUD6iBfvI4n
+nnjC2kBf4MPkR3vZhhX1cvdAP5REQATyQaBRtJRrbqOmTaL/4ioSz/59w1bnnhXGfvNteGyPfUP7
+6DZ7avSgjIdlfrHHL2Auctb/Io6ICV4uAu0XPnnx2hB2RM+FljJ89+VecRSINPaSdbKfuCzHEDi2
+SXwi4gggdZBoFx4nAkte6kKUEDK2432wAtEbdmg/+RBHRI7vtJE+VNde7NFvF0YmDyYjmCB62KVN
+tBHxRcCZuOgjfWJCoizH+WQfjPyhIbZpNwJOXaX40A/6UFMdlHdm9InvtA02pbg4H32KgAj88gQS
+Ar1M2OrcP5lAPx4JdNu11gxhVsUf1+fCL5UQFC5sDxvg2bHt+REAXuxzAUAQ4ttJu17Gbfjxuuyn
+DvLTLuqiXWwjluUSxynnZRAtkrfV21+qPPaxTVlsJDlQBvvw8nx893Jx2952JgaSi6fzwA4v37ZM
+895qWwd1ez+pT0kERCB/BCpi0NzVRhd8pESVf17Um+ri5NvJTxc8LniSb3u+UuVLCYvn57NUmbru
+9zpcfHw7Xk/yO/XSfi+T7Esyf3wbsSMhuKRSZbFPPkTU83k5KzTvzdtaF6ZevrZ1xPtJGSUREIH8
+EahQE7R5TnSRRv8fYbPo9rtpdOtrmh0iz7eWbc7rRV6fdtWnjGOqTdna5MFebfN53fHP2pStTZ64
+TX0XARH4ZQlUCHQkzo1bNA+zoweFIz7/MkwYPiI06xz9OcwyYY1ftomqTQREQASKScBi0NZ1vOjZ
+0R/H/+jL0KRr9LPhJbrgwhWTinotAiIgAjkgUOFB05BIi1lu13qNFUyY51bzMC0H7VYTREAERGCh
+J/CzQM/r6tx5D7sW+p6rgyIgAiKQcwJaX5XzE6TmiYAIFJeABLq45149FwERyDkBCXTOT5CaJwIi
+UFwCEujinnv1XAREIOcEJNA5P0FqngiIQHEJSKCLe+7VcxEQgZwTkEDn/ASpeSIgAsUlIIEu7rlX
+z0VABHJOQAKd8xOk5omACBSXgAS6uOdePRcBEcg5AQl0zk+QmicCIlBcAhLo4p579VwERCDnBCTQ
+OT9Bap4IiEBxCUigi3vu1XMREIGcE5BA5/wEqXkiIALFJSCBLu65V89FQARyTkACnfMTpOaJgAgU
+l4AEurjnXj0XARHIOQEJdM5PkJonAiJQXAIS6OKee/VcBEQg5wQk0Dk/QWqeCIhAcQlIoIt77tVz
+ERCBnBOQQOf8BKl5IiACxSUggS7uuVfPRUAEck5AAp3zE6TmiYAIFJeABLq45149FwERyDkBCXTO
+T5CaJwIiUFwCEujinnv1XAREIOcEJNA5P0FqngiIQHEJSKCLe+7VcxEQgZwTkEDn/ASpeSIgAsUl
+IIEu7rlXz0VABHJOQAKd8xOk5omACBSXgAS6uOdePRcBEcg5AQl0zk+QmicCIlBcAhLo4p579VwE
+RCDnBCTQOT9Bap4IiEBxCUigi3vu1XMREIGcE5BA5/wEqXkiIALFJSCBLu65V89FQARyTkACnfMT
+pOaJgAgUl4AEurjnXj0XARHIOQEJdM5PkJonAiJQXAIS6OKee/VcBEQg5wQk0Dk/QWqeCIhAcQlI
+oIt77tVzERCBnBOQQOf8BKl5IiACxSUggS7uuVfPRUAEck5AAp3zE6TmiYAIFJeABLq45149FwER
+yDkBCXTOT5CaJwIiUFwCEujinnv1XAREIOcEJNA5P0FqngiIQHEJSKCLe+7VcxEQgZwTkEDn/ASp
+eSIgAsUlIIEu7rlXz0VABHJOQAKd8xOk5omACBSXgAS6uOdePRcBEcg5AQl0zk+QmicCIlBcAhLo
+4p579VwERCDnBCTQOT9Bap4IiEBxCUigi3vu1XMREIGcE5BA5/wEqXkiIALFJSCBLu65V89FQARy
+TkACnfMTpOaJgAgUl4AEurjnXj0XARHIOQEJdM5PkJonAiJQXAIS6OKee/VcBEQg5wQk0Dk/QWqe
+CIhAcQlIoIt77tVzERCBnBOQQOf8BKl5IiACxSUggS7uuVfPRUAEck5AAp3zE6TmiYAIFJeABLq4
+5149FwERyDkBCXTOT5CaJwIiUFwCEujinnv1XAREIOcEJNA5P0FqngiIQHEJSKCLe+7VcxEQgZwT
+kEDn/ASpeSIgAsUl0LRk1xs1inbPnXeI76Tktu/z477Np+9Llmnoba/T66vvdnVtLmWTfWkTLOLt
+TmuvPuWTbUhu18dmskzSZkNvJ+vTtggsqASia4PLI5bmE+jGTZrEDuurCIiACIjAL0VgzuzZVar6
+WaAjr3nOrNlh5Pvvh1lRFny7pK9TpaQ2REAEREAEGoQAWosYd15p5dC4aeQkz61wpU2gGzVuHKZP
+mhw691g67H3qTaFFy5Zhtil5o2DRjnlyTZmG26ZfFY34+VZ/rrUr6zqoOV5n3bbJPTfiUBGeqOBY
+0Y+I1s89ikUvfs4zj2eUPeqptcHMJLepwQo5/3LbnA9vx7w2VG6XbufP+SuOw4Ei5ds4r47KNtZy
+u7IP1ON1VLSx/La3qaKOn9tUdTuyRsaKxFfMxnbNO6IPEcg3gXnjlmu9ceMmYca0aeHxm24Oo4YN
+Cy3atg1z58wx0bZOcJHOnjM3TJ4xI8yIBJuDFWpsV2ZFR+0iiN4qrpx5F0V8mwzJ/BW7KiqpMGPv
+NI5kglJdmVrarLRXYdYu2nlfYwpUsednRZq3HX14efbMq7Li4LxtNjxPyTbHOczL63b49FTFRrSz
+LEsKJGzWZduKz2tAlTqjjcrtlHVYv2J1JLfnmZ+/H9GBWrfBjFYUoEySPXUoicACTgAneebMGWHO
+3DnREPcxHw33VVddteJSQSiiTHPatY0+owx2Mczrdfy7g0ju+zW2aYv3hfpJvs33hmhT3GayjuQ2
+eT35MbaTbYrv83y1zeP53UZym/2+z23WddttePn6blPObTRkG9wW9pVEYGEgwHUSOciNJ06KPt05
+rgh7VHRvnlfZZOy4ny/whaHj6oMIiIAILAgEIpGeyyKNmAf980PCeR2Y2zTahZrjpfhnuc4ljye3
+y5X7pfcn25Xcrqk9yfzJ7ZrKlzuetJPcTpZLHk9u1zV/snxyO2lP2yIgAtkQ8GvPQ57zaplPoC0m
+6reQ/lmuScnjye1y5X7p/cl2Jbdrak8yf3K7pvLljiftJLeT5ZLHk9t1zZ8sn9xO2tO2CIhANgTK
+XHv6JWE2uGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZc
+ZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARS
+E5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigD
+IiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0B
+CXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUE
+REAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BA
+p0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiAC
+IpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2
+XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAE
+UhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0Yo
+AyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpAN
+AQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVV
+BERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQ
+QKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIg
+AiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0
+NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERA
+BFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdG
+KAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQ
+DQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0Nlxl
+VQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFIT
+kECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMi
+IAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJ
+dDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQRE
+QARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECn
+RigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIi
+kA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZc
+ZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARS
+E5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigD
+IiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0B
+CXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUE
+REAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BA
+p0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiAC
+IpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2
+XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAE
+UhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0Yo
+AyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpAN
+AQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVV
+BERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQ
+QKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIg
+AiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERABFITkECnRigDIiACIpANAQl0
+NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdGKAMiIAIikA0BCXQ2XGVVBERA
+BFITkECnRigDIiACIpANAQl0NlxlVQREQARSE5BAp0YoAyIgAiKQDQEJdDZcZVUEREAEUhOQQKdG
+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
+Ao5AaSPw/y/rbdCkSyETAAAAAElFTkSuQmCC" />
+</div>
+</div>
+<div class="paragraph"><p>Let&#8217;s examine the main portions of the code provided in the sample:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">SecureNoteActivity</span> - Main activity UI for entering note text and selecting an algorithm.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">GetPasswordDialog</span> - Dialog to enter a password for saving/loading a note. When saving, requires verification of newly entered password.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">PasswordEncryptor</span> - Abstraction of logic for password-based encryption
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">RSAHardwareEncryptor</span> - Abstraction of logic for hardware-bound key encryption
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Our focus will be to fill in the encryption/decryption pieces of <span class="monospaced">PasswordEncryptor</span> and <span class="monospaced">RSAHardwareEncryptor</span>.</p></div>
+<div class="sect2">
+<h3 id="_symmetric_password_based_encryption">11.1. Symmetric Password-Based Encryption</h3>
+<div class="paragraph"><p>Let&#8217;s focus on password encryption first. Inside <span class="monospaced">PasswordEncryptor</span>, there are three methods we need to fill in:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">generateSecretKey()</span> - Create a new key object from the password material.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">encryptData()</span> - Take plain text data and write it (encrypted) to a stream.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">decryptData()</span> - Take encrypted data from a stream and decrypt it.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The hooks for triggering this logic from the user interface are already in place:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Implement <span class="monospaced">generateSecretKey()</span>:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Get an instance of a <span class="monospaced">SecretKeyFactory</span> using the "PBKDF2WithHmacSHA1" algorithm
+</p>
+</li>
+<li>
+<p>
+Create a new <span class="monospaced">PBEKeySpec</span> with the supplied password parameters
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon tip">
+</td>
+<td class="content">Use an iterations count of at least 1000</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+Generate a new <span class="monospaced">SecretKey</span> from the factory with <span class="monospaced">generateSecret()</span>
+</p>
+</li>
+<li>
+<p>
+Return a new <span class="monospaced">SecretKeySpec</span> containing the raw key bytes and algorithm:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="k">new</span> <span class="n">SecretKeySpec</span><span class="o">(</span><span class="n">keyBytes</span><span class="o">,</span> <span class="s">&quot;AES&quot;</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Implement <span class="monospaced">encryptData()</span> to write incoming data to a stream:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Get a Cipher instance loaded with the "AES/CBC/PKCS5Padding" algorithm (already defined for your as <span class="monospaced">ENCRYPTION_ALGORITHM</span>)
+</p>
+</li>
+<li>
+<p>
+Use the provided <span class="monospaced">SecureRandom</span> to generate a random salt:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="kt">byte</span><span class="o">[]</span> <span class="n">salt</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">SALT_LENGTH</span><span class="o">];</span>
+<span class="n">mSecureRandom</span><span class="o">.</span><span class="na">nextBytes</span><span class="o">(</span><span class="n">salt</span><span class="o">);</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+Repeat the same process to create a new initialization vector (<span class="monospaced">iv</span>). The length of the array should be <span class="monospaced">cipher.getBlockSize()</span>.
+</p>
+</li>
+<li>
+<p>
+Initialize the cipher with your key and iv:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="n">Key</span> <span class="n">key</span> <span class="o">=</span> <span class="n">generateSecretKey</span><span class="o">(</span><span class="n">passphrase</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">(),</span> <span class="n">salt</span><span class="o">);</span>
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">ENCRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="k">new</span> <span class="n">IvParameterSpec</span><span class="o">(</span><span class="n">iv</span><span class="o">));</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+Call <span class="monospaced">doFinal()</span> on the cipher to return an encrypted version of the incoming <span class="monospaced">data</span> bytes.
+</p>
+</li>
+<li>
+<p>
+We need the <em>salt</em> and <em>iv</em> again to decrypt the data. Write all three items (Base64-encoded) to supplied <span class="monospaced">OutputStream</span>.
+</p>
+</li>
+<li>
+<p>
+Write the supplied <span class="monospaced">DELIMITER</span> character in between each element so they can easily be split apart later.
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon tip">
+</td>
+<td class="content">We chose <em>&amp;</em> as the delimiter because it is a character not present in the Base64 encoding alphabet.</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+<span class="monospaced">flush()</span> and <span class="monospaced">close()</span> the <span class="monospaced">OutputStream</span>
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Implement <span class="monospaced">decryptData()</span> to reverse the process:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Use the supplied <span class="monospaced">readFile()</span> method to stream the encrypted data into memory as a string.
+</p>
+</li>
+<li>
+<p>
+Split the string on <span class="monospaced">DELIMITER</span> to get back the original three fields (salt, iv, encrypted data).
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon tip">
+</td>
+<td class="content">Don&#8217;t forget to Base64 decode each field after splitting them!</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+Init a new cipher for decryption using the same algorithm and key:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="n">Key</span> <span class="n">key</span> <span class="o">=</span> <span class="n">generateSecretKey</span><span class="o">(</span><span class="n">passphrase</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">(),</span> <span class="n">salt</span><span class="o">);</span>
+<span class="n">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">ENCRYPTION_ALGORITHM</span><span class="o">);</span>
+
+<span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">Cipher</span><span class="o">.</span><span class="na">DECRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="k">new</span> <span class="n">IvParameterSpec</span><span class="o">(</span><span class="n">iv</span><span class="o">));</span>
+</pre></div></div></div>
+</li>
+<li>
+<p>
+Return the result of <span class="monospaced">doFinal()</span> to get back the decrypted note.
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Build and deploy the application to your device/emulator.
+</p>
+</li>
+<li>
+<p>
+Select the <em>Password-Based</em> option and type in some note text.
+</p>
+</li>
+<li>
+<p>
+Click <em>Save</em>, and enter a new password. You should see a message saying the save was successful.
+</p>
+</li>
+<li>
+<p>
+Connect to your device&#8217;s shell and view the saved file:
+</p>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>$ adb shell cat /data/data/com.example.android.securenote/files/secure.note
+OlpcR+xyPsaBXtZP2mkZdtxrMGnTnSmqM/r0RzVFJjk=&amp;o0hKRxL3MVw1D1wQFUIV+w==&amp;fOToQqDlEaBhgKlnCsgbgSUckemI/XBp9TPBY+SPTYWiHvICsmBT42miMCz0wui/pAMQ+OaehUAN3DayPKEoWw==</pre>
+</div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon note">
+</td>
+<td class="content">This can only be done on an emulator or rooted device. Production devices have this directory protected!</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+Looks pretty encrypted! Click <em>Load</em>, and enter the same password. You should see the note text displayed below the entry field.
+</p>
+</li>
+</ol></div>
+</div>
+<div class="sect2">
+<h3 id="_using_a_hardware_bound_rsa_key">11.2. Using a Hardware-Bound RSA Key</h3>
+<div class="paragraph"><p>Now let&#8217;s try this using a private key that is tucked away in a non-exportable block of the hardware. The <span class="monospaced">RSAHardwareEncryptor</span> has four methods you will need to implement:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">retrievePublicKey()</span> - Get the public (encryption) key from storage.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">retrievePrivateKey()</span> - Get the private (decryption) key from the keystore.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">encryptData()</span> - Take plain text data and write it (encrypted) to a stream.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">decryptData()</span> - Take encrypted data from a stream and decrypt it.
+</p>
+</li>
+</ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon note">
+</td>
+<td class="content">Hardware-backed key storage is only available on Android 4.3+</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>The hooks for triggering this logic from the user interface are already in place:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Read through and take a moment to understand the <span class="monospaced">generatePrivateKey()</span> method.
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+This method is responsible for creating the public/private key pair and persisting them both.
+</p>
+</li>
+<li>
+<p>
+The public key is stored to <span class="monospaced">SharedPreferences</span>.
+</p>
+</li>
+<li>
+<p>
+The private key is bound to the hardware keystore. It can be referenced later by its <em>alias</em> (<span class="monospaced">KEY_ALIAS</span> in this case).
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Implement <span class="monospaced">retrievePublicKey()</span> to create the encryption key:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Retrieve the encoded key string from <span class="monospaced">SharedPreferences</span>.
+</p>
+</li>
+<li>
+<p>
+Decode the string with <span class="monospaced">Base64.decode()</span> into raw bytes.
+</p>
+</li>
+<li>
+<p>
+Use a <span class="monospaced">KeyFactory</span> to return a <span class="monospaced">PublicKey</span> objeect from the bytes:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">KeyFactory</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">KEY_ALGORITHM</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">generatePublic</span><span class="o">(</span><span class="k">new</span> <span class="n">X509EncodedKeySpec</span><span class="o">(</span><span class="n">publicKey</span><span class="o">));</span>
+</pre></div></div></div>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Implement <span class="monospaced">retrievePrivateKey()</span> to get the decryption key from hardware:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Get a <span class="monospaced">KeyStore</span> instance of the "AndroidKeyStore".
+</p>
+</li>
+<li>
+<p>
+Load the <span class="monospaced">KeyStore</span> with <span class="monospaced">null</span> as the <span class="monospaced">InputStream</span> parameter to initialize it.
+</p>
+</li>
+<li>
+<p>
+Get the <span class="monospaced">KeyStore.Entry</span> associated with our <span class="monospaced">KEY_ALIAS</span> from the <span class="monospaced">KeyStore</span>.
+</p>
+</li>
+<li>
+<p>
+Return the <span class="monospaced">PrivateKey</span> from the entry with <span class="monospaced">getPrivateKey()</span>:
+</p>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">((</span><span class="n">KeyStore</span><span class="o">.</span><span class="na">PrivateKeyEntry</span><span class="o">)</span> <span class="n">entry</span><span class="o">).</span><span class="na">getPrivateKey</span><span class="o">();</span>
+</pre></div></div></div>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Implement <span class="monospaced">encryptData()</span> to write incoming data to a stream:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Retrieve an instance of the <em>public</em> key.
+</p>
+</li>
+<li>
+<p>
+Initialize a new cipher in encrypt mode with the "RSA/ECB/PKCS1Padding" algorithm.
+</p>
+</li>
+<li>
+<p>
+Wrap the supplied <span class="monospaced">OutputStream</span> in a <span class="monospaced">Base64OutputStream</span> to encode all characters before file writing.
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon tip">
+</td>
+<td class="content">Add the <span class="monospaced">Base64.NO_WRAP</span> flag to the stream to avoid reading conflicts.</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+Wrap the encoding stream from the previous step in a <span class="monospaced">CipherOutputStream</span> to apply our cipher to all bytes written.
+</p>
+</li>
+<li>
+<p>
+Write the incoming data to our wrapped <span class="monospaced">OutputStream</span>, <span class="monospaced">flush()</span> and <span class="monospaced">close()</span>.
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Implement <span class="monospaced">decryptData()</span> to reverse the process:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Retrieve an instance of the <em>private</em> key.
+</p>
+</li>
+<li>
+<p>
+Initialize a new cipher in decrypt mode with the key and the same RSA algorithm.
+</p>
+</li>
+<li>
+<p>
+Wrap the provided <span class="monospaced">InputStream</span> in a <span class="monospaced">Base64InputStream</span> to decode the file bytes.
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon note">
+</td>
+<td class="content">Don&#8217;t forget the <span class="monospaced">Base64.NO_WRAP</span> flag again!</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+Wrap the decoder stream in a <span class="monospaced">CipherInputStream</span> to apply decryption to the incoming data.
+</p>
+</li>
+<li>
+<p>
+Use the supplied <span class="monospaced">readFile()</span> helper to read data from the incoming stream
+</p>
+</li>
+<li>
+<p>
+Return the decoded data as a <span class="monospaced">byte[]</span>.
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon tip">
+</td>
+<td class="content">You can use <span class="monospaced">getBytes()</span> to return the bytes of a <span class="monospaced">String</span>.</td>
+</tr></table>
+</div>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Run the application again. Type a new secret message to save.
+</p>
+</li>
+<li>
+<p>
+Select the <em>Key-Based</em> option, and click <em>Save</em>.
+</p>
+</li>
+<li>
+<p>
+If the save was successful, you can click <em>Load</em> and see your typed message in the lower box.
+</p>
+</li>
+</ol></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_review_questions_2">12. Review Questions</h2>
+<div class="sectionbody">
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Name three of the primary APIs for persisting data in Android.
+</p>
+</li>
+<li>
+<p>
+Why is it a bad idea hard-code secret keys in your application code?
+</p>
+</li>
+<li>
+<p>
+What is the preferred method of generating a unique ID for your application user?
+</p>
+</li>
+<li>
+<p>
+what is the one type of persisted data that cannot be (directly) encrypted?
+</p>
+</li>
+<li>
+<p>
+What is the name of the package that provides encryption for SQLite?
+</p>
+</li>
+<li>
+<p>
+What is the primary advantage of the accounts framework?
+</p>
+</li>
+<li>
+<p>
+Is password-based encryption symmetric or asymmetric? What does that mean?
+</p>
+</li>
+<li>
+<p>
+What is the difference between the system KeyChain and the system KeyStore?
+</p>
+</li>
+<li>
+<p>
+When is it safe to persist an encryption key in the system KeyStore?
+</p>
+</li>
+<li>
+<p>
+How do we check if the device supports this?
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p></p></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr></div>
+<div id="footer">
+<div id="footer-text">
+<style type="text/css">
+td.icon {
+  height: 50px;
+  width: 60px !important;
+}
+.icon.tip {
+  background: url("data:image/png;base64,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") no-repeat center center;
+}
+.icon.note {
+  background: url("data:image/png;base64,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") no-repeat center center;
+}
+.icon.warning {
+  background: url("data:image/png;base64,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") no-repeat center center;
+}
+.icon.important {
+  background: url("data:image/png;base64,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") no-repeat center center;
+}
+.icon.caution {
+  background: url("data:image/png;base64,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") no-repeat center center;
+}
+</style>
+</div>
+</div>
+<style type="text/css">
+.deck-container .deck-toc li a span{color: #888;display:inline;}
+</style>
+</body>
+</html>
