@@ -2,7 +2,6 @@ package com.example.android.securenote.crypto;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.security.KeyChain;
 import android.security.KeyPairGeneratorSpec;
 import android.util.Base64;
 import android.util.Base64InputStream;
@@ -14,21 +13,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Calendar;
@@ -49,13 +41,13 @@ public class RSAHardwareEncryptor {
     private static final String KEY_PUBLIC = "publickey";
     private static final String KEY_ALIAS = "secureKeyAlias";
 
-    private SharedPreferences mPublicKeyStore;
+    private SharedPreferences publicKeyStore;
 
     public RSAHardwareEncryptor(Context context) {
-        mPublicKeyStore = context.getSharedPreferences(
+        publicKeyStore = context.getSharedPreferences(
                 "publickey.store", Context.MODE_PRIVATE);
         try {
-            if (!mPublicKeyStore.contains(KEY_PUBLIC)) {
+            if (!publicKeyStore.contains(KEY_PUBLIC)) {
                 generatePrivateKey(context);
                 Log.d(TAG, "Generated hardware-bound key");
             } else {
@@ -113,14 +105,14 @@ public class RSAHardwareEncryptor {
 
     public Key retrievePublicKey() throws
             NoSuchAlgorithmException, InvalidKeySpecException {
-        String encodedKey = mPublicKeyStore.getString(KEY_PUBLIC, null);
+        String encodedKey = publicKeyStore.getString(KEY_PUBLIC, null);
         if (encodedKey == null) {
             throw new RuntimeException("Expected valid public key!");
         }
 
         byte[] publicKey = Base64.decode(encodedKey, Base64.NO_WRAP);
         return KeyFactory.getInstance(KEY_ALGORITHM)
-                        .generatePublic(new X509EncodedKeySpec(publicKey));
+                .generatePublic(new X509EncodedKeySpec(publicKey));
     }
 
     public Key retrievePrivateKey() throws
@@ -158,7 +150,7 @@ public class RSAHardwareEncryptor {
         //Persist the public key
         PublicKey publicKey = kp.getPublic();
         String encodedKey = Base64.encodeToString(publicKey.getEncoded(), Base64.NO_WRAP);
-        mPublicKeyStore.edit().putString(KEY_PUBLIC, encodedKey).apply();
+        publicKeyStore.edit().putString(KEY_PUBLIC, encodedKey).apply();
     }
 
     private String readFile(InputStream in) throws IOException {

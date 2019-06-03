@@ -1,14 +1,11 @@
 package com.example.android.securenote.crypto;
 
 import android.util.Base64;
-import android.util.Base64OutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -17,7 +14,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
 import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
@@ -31,11 +27,11 @@ public class PasswordEncryptor {
     private static final int SALT_LENGTH = KEY_LENGTH / 8;
     private static final String DELIMITER = "&";
 
-    private SecureRandom mSecureRandom;
+    private SecureRandom secureRandom;
 
     public PasswordEncryptor() {
         // Do *not* seed secureRandom! Automatically seeded from system entropy.
-        mSecureRandom = new SecureRandom();
+        secureRandom = new SecureRandom();
     }
 
     /**
@@ -49,10 +45,10 @@ public class PasswordEncryptor {
         Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
 
         byte[] salt = new byte[SALT_LENGTH];
-        mSecureRandom.nextBytes(salt);
+        secureRandom.nextBytes(salt);
 
         byte[] iv = new byte[cipher.getBlockSize()];
-        mSecureRandom.nextBytes(iv);
+        secureRandom.nextBytes(iv);
 
         Key key = generateSecretKey(passphrase.toCharArray(), salt);
         cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
