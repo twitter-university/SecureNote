@@ -37,6 +37,7 @@ public class GetPasswordDialog extends DialogFragment implements
 
     public interface OnPasswordListener {
         public void onPasswordValid(int requestType, String password);
+
         public void onPasswordCancel();
     }
 
@@ -64,9 +65,9 @@ public class GetPasswordDialog extends DialogFragment implements
         getDialog().setTitle(R.string.get_password_label);
         View content = inflater.inflate(R.layout.get_password, container, false);
 
-        mPassword = (EditText) content.findViewById(R.id.password_text);
-        mPasswordVerification = (EditText) content.findViewById(R.id.password_verification_text);
-        mOkButton = (Button) content.findViewById(R.id.ok_button);
+        mPassword = content.findViewById(R.id.password_text);
+        mPasswordVerification = content.findViewById(R.id.password_verification_text);
+        mOkButton = content.findViewById(R.id.ok_button);
 
         content.findViewById(R.id.cancel_button).setOnClickListener(this);
         mOkButton.setOnClickListener(this);

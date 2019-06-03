@@ -4,6 +4,7 @@ package com.example.android.securenote;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -35,10 +36,10 @@ public class SecureNoteActivity extends Activity implements
     private static final int GET_PASSWORD_FOR_LOAD = 1;
     private static final int GET_PASSWORD_FOR_SAVE = 2;
 
-    private EditText mNoteText;
-    private TextView mResultText;
-    private RadioGroup mEncryptionSelect;
-    private Button mSaveButton;
+    private EditText noteText;
+    private TextView resultText;
+    private RadioGroup encryptionSelect;
+    private Button saveButton;
 
     private PasswordEncryptor mPasswordEncryptor;
     private RSAHardwareEncryptor mHardwareEncryptor;
@@ -48,15 +49,15 @@ public class SecureNoteActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.secure_note);
 
-        mNoteText = (EditText) findViewById(R.id.note_text);
-        mResultText = (TextView) findViewById(R.id.text_result);
-        mEncryptionSelect = (RadioGroup) findViewById(R.id.type_select);
-        mSaveButton = (Button) findViewById(R.id.save_button);
+        noteText = findViewById(R.id.note_text);
+        resultText = findViewById(R.id.text_result);
+        encryptionSelect = findViewById(R.id.type_select);
+        saveButton = findViewById(R.id.save_button);
 
         findViewById(R.id.load_button).setOnClickListener(this);
-        mSaveButton.setOnClickListener(this);
-        mNoteText.addTextChangedListener(this);
-        mNoteText.setText(null);
+        saveButton.setOnClickListener(this);
+        noteText.addTextChangedListener(this);
+        noteText.setText(null);
 
         mPasswordEncryptor = new PasswordEncryptor();
         mHardwareEncryptor = new RSAHardwareEncryptor(this);
@@ -126,7 +127,7 @@ public class SecureNoteActivity extends Activity implements
     }
 
     public void onClick(View v) {
-        int encryptionType = mEncryptionSelect.getCheckedRadioButtonId();
+        int encryptionType = encryptionSelect.getCheckedRadioButtonId();
         switch (v.getId()) {
             case R.id.load_button:
                 if (encryptionType == R.id.type_password) {
@@ -150,7 +151,7 @@ public class SecureNoteActivity extends Activity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mNoteText.getText().clear();
+        noteText.getText().clear();
     }
 
     private void deleteSecureNote() {
@@ -164,10 +165,10 @@ public class SecureNoteActivity extends Activity implements
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void saveSecureNote(final String passkey) {
         Log.d(TAG, "Saving note");
         new AsyncTask<String, Void, Boolean>() {
-
             @Override
             protected Boolean doInBackground(String... strings) {
                 try {
@@ -191,16 +192,17 @@ public class SecureNoteActivity extends Activity implements
             @Override
             protected void onPostExecute(Boolean result) {
                 if (result) {
-                    mNoteText.getText().clear();
+                    noteText.getText().clear();
                     toast(R.string.saved_note);
                 } else {
                     toast(R.string.failed_to_save);
                 }
             }
 
-        }.execute(mNoteText.getText().toString());
+        }.execute(noteText.getText().toString());
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void loadSecureNote(final String passkey) {
         Log.d(TAG, "Loading note...");
         new AsyncTask<Void, Void, String>() {
@@ -227,7 +229,7 @@ public class SecureNoteActivity extends Activity implements
                 if (result == null) {
                     toast(R.string.failed_to_load);
                 } else {
-                    mResultText.setText(result);
+                    resultText.setText(result);
                     toast(R.string.loaded_note);
                 }
             }
@@ -239,18 +241,20 @@ public class SecureNoteActivity extends Activity implements
     }
 
     public void afterTextChanged(Editable s) {
-        mSaveButton.setEnabled(s.length() != 0);
+        saveButton.setEnabled(s.length() != 0);
     }
 
     @Override
     public void beforeTextChanged(CharSequence s,
                                   int start,
                                   int count,
-                                  int after) { }
+                                  int after) {
+    }
 
     @Override
     public void onTextChanged(CharSequence s,
                               int start,
                               int before,
-                              int count) { }
+                              int count) {
+    }
 }

@@ -1,28 +1,15 @@
 package com.example.android.securenote.crypto;
 
-import android.util.Base64;
-import android.util.Base64OutputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.security.GeneralSecurityException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 public class PasswordEncryptor {
 
@@ -34,11 +21,11 @@ public class PasswordEncryptor {
     // We chose '&' because is not part of the Base64 character set
     private static final String DELIMITER = "&";
 
-    private SecureRandom mSecureRandom;
+    private SecureRandom secureRandom;
 
     public PasswordEncryptor() {
         // Do *not* seed secureRandom! Automatically seeded from system entropy.
-        mSecureRandom = new SecureRandom();
+        secureRandom = new SecureRandom();
     }
 
     /**

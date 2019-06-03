@@ -52,13 +52,13 @@ public class RSAHardwareEncryptor {
     private static final String KEY_ALIAS = "secureKeyAlias";
 
     //Persistent location where we will save the public key
-    private SharedPreferences mPublicKeyStore;
+    private SharedPreferences publicKeyStore;
 
     public RSAHardwareEncryptor(Context context) {
-        mPublicKeyStore = context.getSharedPreferences(
+        publicKeyStore = context.getSharedPreferences(
                 "publickey.store", Context.MODE_PRIVATE);
         try {
-            if (!mPublicKeyStore.contains(KEY_PUBLIC)) {
+            if (!publicKeyStore.contains(KEY_PUBLIC)) {
                 generatePrivateKey(context);
                 Log.d(TAG, "Generated hardware-bound key");
             } else {
@@ -97,7 +97,7 @@ public class RSAHardwareEncryptor {
         //Persist the public key
         PublicKey publicKey = kp.getPublic();
         String encodedKey = Base64.encodeToString(publicKey.getEncoded(), Base64.NO_WRAP);
-        mPublicKeyStore.edit().putString(KEY_PUBLIC, encodedKey).apply();
+        publicKeyStore.edit().putString(KEY_PUBLIC, encodedKey).apply();
     }
 
     /**
