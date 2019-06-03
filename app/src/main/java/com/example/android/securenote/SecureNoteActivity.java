@@ -41,8 +41,8 @@ public class SecureNoteActivity extends Activity implements
     private RadioGroup encryptionSelect;
     private Button saveButton;
 
-    private PasswordEncryptor mPasswordEncryptor;
-    private RSAHardwareEncryptor mHardwareEncryptor;
+    private PasswordEncryptor passwordEncryptor;
+    private RSAHardwareEncryptor hardwareEncryptor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,8 +59,8 @@ public class SecureNoteActivity extends Activity implements
         noteText.addTextChangedListener(this);
         noteText.setText(null);
 
-        mPasswordEncryptor = new PasswordEncryptor();
-        mHardwareEncryptor = new RSAHardwareEncryptor(this);
+        passwordEncryptor = new PasswordEncryptor();
+        hardwareEncryptor = new RSAHardwareEncryptor(this);
     }
 
     @Override
@@ -175,9 +175,9 @@ public class SecureNoteActivity extends Activity implements
                     OutputStream out = openFileOutput(FILENAME, MODE_PRIVATE);
                     byte[] noteData = strings[0].getBytes();
                     if (passkey == null) {
-                        mHardwareEncryptor.encryptData(noteData, out);
+                        hardwareEncryptor.encryptData(noteData, out);
                     } else {
-                        mPasswordEncryptor.encryptData(passkey, noteData, out);
+                        passwordEncryptor.encryptData(passkey, noteData, out);
                     }
                     Log.d(TAG, "Saved note to " + FILENAME);
 
@@ -212,9 +212,9 @@ public class SecureNoteActivity extends Activity implements
                     InputStream in = openFileInput(FILENAME);
                     byte[] decrypted;
                     if (passkey == null) {
-                        decrypted = mHardwareEncryptor.decryptData(in);
+                        decrypted = hardwareEncryptor.decryptData(in);
                     } else {
-                        decrypted = mPasswordEncryptor.decryptData(passkey, in);
+                        decrypted = passwordEncryptor.decryptData(passkey, in);
                     }
                     Log.d(TAG, "Loaded note from " + FILENAME);
                     return new String(decrypted);
