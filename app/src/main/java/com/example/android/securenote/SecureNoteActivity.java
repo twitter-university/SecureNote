@@ -1,15 +1,12 @@
 
 package com.example.android.securenote;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,7 +23,10 @@ import android.widget.Toast;
 import com.example.android.securenote.crypto.PasswordEncryptor;
 import com.example.android.securenote.crypto.RSAHardwareEncryptor;
 
-public class SecureNoteActivity extends Activity implements
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class SecureNoteActivity extends AppCompatActivity implements
         OnClickListener, TextWatcher, GetPasswordDialog.OnPasswordListener {
     private static final String TAG = SecureNoteActivity.class.getSimpleName();
 
@@ -101,7 +101,7 @@ public class SecureNoteActivity extends Activity implements
         Log.d(TAG, "Getting password");
         GetPasswordDialog dialog = GetPasswordDialog.newInstance(requestCode,
                 6, verifyPasswords);
-        dialog.show(getFragmentManager(),
+        dialog.show(getSupportFragmentManager(),
                 GetPasswordDialog.class.getSimpleName());
     }
 

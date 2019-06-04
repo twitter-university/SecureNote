@@ -32,8 +32,7 @@ import javax.crypto.CipherOutputStream;
 import javax.security.auth.x500.X500Principal;
 
 public class RSAHardwareEncryptor {
-    private static final String TAG =
-            RSAHardwareEncryptor.class.getSimpleName();
+    private static final String TAG = RSAHardwareEncryptor.class.getSimpleName();
     private static final String PROVIDER_NAME = "AndroidKeyStore";
     private static final String KEY_ALGORITHM = "RSA";
     private static final String ENCRYPTION_ALGORITHM = "RSA/ECB/PKCS1Padding";
@@ -103,7 +102,7 @@ public class RSAHardwareEncryptor {
         return readFile(in).getBytes();
     }
 
-    public Key retrievePublicKey() throws
+    private Key retrievePublicKey() throws
             NoSuchAlgorithmException, InvalidKeySpecException {
         String encodedKey = publicKeyStore.getString(KEY_PUBLIC, null);
         if (encodedKey == null) {
@@ -115,7 +114,7 @@ public class RSAHardwareEncryptor {
                 .generatePublic(new X509EncodedKeySpec(publicKey));
     }
 
-    public Key retrievePrivateKey() throws
+    private Key retrievePrivateKey() throws
             GeneralSecurityException, IOException {
         KeyStore ks = KeyStore.getInstance(PROVIDER_NAME);
         ks.load(null);

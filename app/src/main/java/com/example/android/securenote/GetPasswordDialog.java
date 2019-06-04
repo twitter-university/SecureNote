@@ -2,7 +2,6 @@
 package com.example.android.securenote;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,17 +13,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.fragment.app.DialogFragment;
+
 public class GetPasswordDialog extends DialogFragment implements
         OnClickListener, TextWatcher {
     private static final String TAG = GetPasswordDialog.class.getSimpleName();
 
-    public static final String VERIFY_PASSWORD_REQUEST_PARAM = "verifyPassword";
-    public static final String MIN_PASSWORD_LENGTH_REQUEST_PARAM = "minPasswordLength";
-    public static final String REQUEST_PARAM = "requestType";
+    private static final String VERIFY_PASSWORD_REQUEST_PARAM = "verifyPassword";
+    private static final String MIN_PASSWORD_LENGTH_REQUEST_PARAM = "minPasswordLength";
+    private static final String REQUEST_PARAM = "requestType";
 
-    public static GetPasswordDialog newInstance(int requestType,
-                                                int minPasswordLength,
-                                                boolean verifyPassword) {
+    static GetPasswordDialog newInstance(int requestType,
+                                         int minPasswordLength,
+                                         boolean verifyPassword) {
         GetPasswordDialog dialog = new GetPasswordDialog();
         Bundle args = new Bundle();
         args.putBoolean(VERIFY_PASSWORD_REQUEST_PARAM, verifyPassword);
@@ -36,27 +37,26 @@ public class GetPasswordDialog extends DialogFragment implements
     }
 
     public interface OnPasswordListener {
-        public void onPasswordValid(int requestType, String password);
+        void onPasswordValid(int requestType, String password);
 
-        public void onPasswordCancel();
+        void onPasswordCancel();
     }
 
-    private EditText mPassword;
-    private EditText mPasswordVerification;
-    private Button mOkButton;
-    private int mMinPasswordLength;
+    private EditText password;
+    private EditText passwordVerification;
+    private Button okButton;
+    private int minPasswordLength;
 
-    private OnPasswordListener mPasswordListener;
+    private OnPasswordListener passwordListener;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mPasswordListener = (OnPasswordListener) activity;
+            passwordListener = (OnPasswordListener) activity;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException(
-                    activity.getClass().getSimpleName()
-                            + " shoud implement OnPasswordListener");
+                    activity.getClass().getSimpleName() + " should implement OnPasswordListener");
         }
     }
 
@@ -65,12 +65,12 @@ public class GetPasswordDialog extends DialogFragment implements
         getDialog().setTitle(R.string.get_password_label);
         View content = inflater.inflate(R.layout.get_password, container, false);
 
-        mPassword = content.findViewById(R.id.password_text);
-        mPasswordVerification = content.findViewById(R.id.password_verification_text);
-        mOkButton = content.findViewById(R.id.ok_button);
+        password = content.findViewById(R.id.password_text);
+        passwordVerification = content.findViewById(R.id.password_verification_text);
+        okButton = content.findViewById(R.id.ok_button);
 
         content.findViewById(R.id.cancel_button).setOnClickListener(this);
-        mOkButton.setOnClickListener(this);
+        okButton.setOnClickListener(this);
 
 
         return content;
@@ -83,24 +83,24 @@ public class GetPasswordDialog extends DialogFragment implements
 
         boolean verifyPassword = args.getBoolean(VERIFY_PASSWORD_REQUEST_PARAM, true);
         if (verifyPassword) {
-            mOkButton.setEnabled(false);
-            mMinPasswordLength = args.getInt(MIN_PASSWORD_LENGTH_REQUEST_PARAM, 0);
-            if (mMinPasswordLength > 0) {
-                mPassword.setHint(super.getString(R.string.password_hint_min_length,
-                        mMinPasswordLength));
+            okButton.setEnabled(false);
+            minPasswordLength = args.getInt(MIN_PASSWORD_LENGTH_REQUEST_PARAM, 0);
+            if (minPasswordLength > 0) {
+                password.setHint(super.getString(R.string.password_hint_min_length,
+                        minPasswordLength));
             }
-            mPassword.addTextChangedListener(this);
-            mPasswordVerification.addTextChangedListener(this);
+            password.addTextChangedListener(this);
+            passwordVerification.addTextChangedListener(this);
         } else {
-            mPasswordVerification.setVisibility(View.GONE);
+            passwordVerification.setVisibility(View.GONE);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mPassword.getText().clear();
-        mPasswordVerification.getText().clear();
+        password.getText().clear();
+        passwordVerification.getText().clear();
         Log.d(TAG, "Cleared password fields");
     }
 
@@ -108,11 +108,11 @@ public class GetPasswordDialog extends DialogFragment implements
         switch (v.getId()) {
             case R.id.ok_button:
                 final int requestType = getArguments().getInt(REQUEST_PARAM);
-                final String password = mPassword.getText().toString();
-                mPasswordListener.onPasswordValid(requestType, password);
+                final String password = this.password.getText().toString();
+                passwordListener.onPasswordValid(requestType, password);
                 break;
             case R.id.cancel_button:
-                mPasswordListener.onPasswordCancel();
+                passwordListener.onPasswordCancel();
                 break;
             default:
                 throw new IllegalArgumentException("Invalid Button");
@@ -122,23 +122,23 @@ public class GetPasswordDialog extends DialogFragment implements
     }
 
     public void afterTextChanged(Editable s) {
-        if (mPassword.length() < mMinPasswordLength) {
+        if (password.length() < minPasswordLength) {
             Log.d(TAG, "Password too short");
-            mOkButton.setEnabled(false);
-        } else if (mPassword.length() != mPasswordVerification.length()) {
+            okButton.setEnabled(false);
+        } else if (password.length() != passwordVerification.length()) {
             Log.d(TAG, "Passwords' length differs");
-            mOkButton.setEnabled(false);
+            okButton.setEnabled(false);
         } else {
-            for (int i = 0; i < mPassword.getText().length(); i++) {
-                if (mPassword.getText().charAt(i) != mPasswordVerification.getText()
+            for (int i = 0; i < password.getText().length(); i++) {
+                if (password.getText().charAt(i) != passwordVerification.getText()
                         .charAt(i)) {
                     Log.d(TAG, "Passwords differ");
-                    mOkButton.setEnabled(false);
+                    okButton.setEnabled(false);
                     return;
                 }
             }
             Log.d(TAG, "Passwords are the same");
-            mOkButton.setEnabled(true);
+            okButton.setEnabled(true);
         }
     }
 
