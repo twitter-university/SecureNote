@@ -2,7 +2,6 @@
 package com.example.android.securenote;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,13 +13,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.fragment.app.DialogFragment;
+
 public class GetPasswordDialog extends DialogFragment implements
         OnClickListener, TextWatcher {
     private static final String TAG = GetPasswordDialog.class.getSimpleName();
 
-    public static final String VERIFY_PASSWORD_REQUEST_PARAM = "verifyPassword";
-    public static final String MIN_PASSWORD_LENGTH_REQUEST_PARAM = "minPasswordLength";
-    public static final String REQUEST_PARAM = "requestType";
+    private static final String VERIFY_PASSWORD_REQUEST_PARAM = "verifyPassword";
+    private static final String MIN_PASSWORD_LENGTH_REQUEST_PARAM = "minPasswordLength";
+    private static final String REQUEST_PARAM = "requestType";
 
     public static GetPasswordDialog newInstance(int requestType,
                                                 int minPasswordLength,
