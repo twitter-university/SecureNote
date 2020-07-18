@@ -56,7 +56,8 @@ public class GetPasswordDialog extends DialogFragment implements
             passwordListener = (OnPasswordListener) activity;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException(
-                    activity.getClass().getSimpleName() + " should implement OnPasswordListener");
+                    activity.getClass().getSimpleName()
+                            + " should implement OnPasswordListener");
         }
     }
 

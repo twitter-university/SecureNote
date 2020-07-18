@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "com.example.android.securenote"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
     }
 
     buildTypes {
@@ -18,5 +18,5 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
 }
