@@ -1,5 +1,5 @@
 = Storage Encryption
 
-This project was created to support various http://thenewcircle.com/training/android/[NewCircle Android Training] courses.
+This project was created to support https://www.protechtraining.com/android-security-pt15256[Protech Android Security Training] course
 
-This application is intended to demonstrate the use of Java cryptography to encrypt data in Android.
+This application is intended to demonstrate the use of Android cryptography to encrypt data in Android.
