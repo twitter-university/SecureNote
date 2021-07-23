@@ -19,4 +19,7 @@
 	<string name="delete_alert">Are you sure you wish to delete?</string>
 	<string name="deleted_note">Deleted your note</string>
 	<string name="failed_to_delete">Failed to delete your note</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+
 </resources>
