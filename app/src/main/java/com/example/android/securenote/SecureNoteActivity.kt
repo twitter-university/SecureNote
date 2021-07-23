@@ -170,22 +170,17 @@ class SecureNoteActivity : androidx.appcompat.app.AppCompatActivity(), OnClickLi
         Log.d(TAG, "Loading note...")
         CoroutineScope(Job()).launch(Dispatchers.IO) {
             try {
-                val decrypted: ByteArray? =
+                val decrypted: ByteArray =
                     if (passkey == null) {
                         hardwareEncryptor.decryptData(openFileInput(FILENAME))
                     } else {
                         PasswordEncryptor.decryptData(passkey,
                             getEncryptedFile().openFileInput())
                     }
-                if (decrypted == null) {
-                    Log.e(TAG, "Failed to load note from $FILENAME")
-                    toast(R.string.failed_to_load)
-                } else {
-                    Log.d(TAG, "Loaded note from $FILENAME")
-                    withContext(Dispatchers.Main) {
-                        secureNoteBinding.textResult.text = String(decrypted)
-                        toast(R.string.loaded_note)
-                    }
+                Log.d(TAG, "Loaded note from $FILENAME")
+                withContext(Dispatchers.Main) {
+                    secureNoteBinding.textResult.text = String(decrypted)
+                    toast(R.string.loaded_note)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to load note from $FILENAME", e)
@@ -217,4 +212,3 @@ class SecureNoteActivity : androidx.appcompat.app.AppCompatActivity(), OnClickLi
         private const val GET_PASSWORD_FOR_SAVE = 2
     }
 }
-

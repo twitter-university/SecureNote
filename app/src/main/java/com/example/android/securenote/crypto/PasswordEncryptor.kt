@@ -1,5 +1,6 @@
 package com.example.android.securenote.crypto
 
+import android.util.Base64
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -9,21 +10,21 @@ import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.security.spec.InvalidKeySpecException
 
+import javax.crypto.Cipher
 import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 object PasswordEncryptor {
     private const val ENCRYPTION_ALGORITHM = "AES/CBC/PKCS5Padding"
     private const val KEY_LENGTH = 256
     private const val SALT_LENGTH = KEY_LENGTH / 8
-
-    //Delimiter should be used between components of the ciphertext
-    // We chose '&' because is not part of the Base64 character set
     private const val DELIMITER = "&"
 
     // Do *not* seed secureRandom! Automatically seeded from system entropy.
     private val secureRandom: SecureRandom = SecureRandom()
-
-
 
     /**
      * Return a cipher text blob of encrypted data, Base64 encoded.
@@ -33,15 +34,26 @@ object PasswordEncryptor {
      */
     @Throws(GeneralSecurityException::class, IOException::class)
     fun encryptData(passphrase: String, data: ByteArray, out: OutputStream) {
-        /*
-         * TODO: Encryption Lab:
-         * Use SecureRandom to generate a new salt, length=SALT_LENGTH
-         * Use SecureRandom to generate a new iv, length=getBlockSize()
-         * Create and use a cipher to encrypt the incoming data (ENCRYPTION_ALGORITHM is already set).
-         * Pack and write all three (salt,iv,encrypted) as a ciphertext blob to the provided stream.
-         * - Each item should have a DELIMITER between it
-         * Don't forget to Base64 encode everything you write to the file
-         */
+        val cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM)
+
+        val salt = ByteArray(SALT_LENGTH)
+        secureRandom.nextBytes(salt)
+
+        val iv = ByteArray(cipher.blockSize)
+        secureRandom.nextBytes(iv)
+
+        val key = generateSecretKey(passphrase.toCharArray(), salt)
+        cipher.init(Cipher.ENCRYPT_MODE, key, IvParameterSpec(iv))
+
+        //Pack the result in a cipher text blob
+        val encrypted = cipher.doFinal(data)
+        out.write(Base64.encode(salt, Base64.NO_WRAP))
+        out.write(DELIMITER.toByteArray())
+        out.write(Base64.encode(iv, Base64.NO_WRAP))
+        out.write(DELIMITER.toByteArray())
+        out.write(Base64.encode(encrypted, Base64.NO_WRAP))
+        out.flush()
+        out.close()
     }
 
     /**
@@ -51,33 +63,40 @@ object PasswordEncryptor {
      * @throws IOException
      */
     @Throws(GeneralSecurityException::class, IOException::class)
-    fun decryptData(passphrase: String, input: InputStream): ByteArray? {
-        /*
-         * TODO: Encryption Lab:
-         * Parse the ciphertext blob and unpack the stored iv, salt, and encrypted contents.
-         * Construct and use a Cipher to decrypt the data.
-         * Return the decrypted bytes.
-         */
-        return null
+    fun decryptData(passphrase: String, input: InputStream): ByteArray {
+        //Unpack cipherText
+        val cipherText = readFile(input)
+        val fields =
+            cipherText.split(DELIMITER.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (fields.size != 3) {
+            throw IllegalArgumentException("Not a valid cipher text blob")
+        }
+
+        val salt = Base64.decode(fields[0], Base64.NO_WRAP)
+        val iv = Base64.decode(fields[1], Base64.NO_WRAP)
+        val encrypted = Base64.decode(fields[2], Base64.NO_WRAP)
+
+        val key = generateSecretKey(passphrase.toCharArray(), salt)
+        val cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM)
+
+        cipher.init(Cipher.DECRYPT_MODE, key, IvParameterSpec(iv))
+
+        return cipher.doFinal(encrypted)
     }
 
-    /**
-     * Create a new symmetric key used in both encryption and decryption
-     *
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
-     */
     @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
-    private fun generateSecretKey(passphraseOrPin: CharArray, salt: ByteArray): SecretKey? {
-        /*
-         * TODO: Encryption Lab:
-         * Generate a new key from the supplied password+salt using AES.
-         * Use KEY_LENGTH for the length of the generated key.
-         */
-        return null
+    private fun generateSecretKey(passphraseOrPin: CharArray, salt: ByteArray): SecretKey {
+        // Number of PBKDF2 hardening rounds to use. Larger values increase
+        // computation time. You should select a value that causes computation
+        // to take >100ms.
+        val iterations = 1000
+
+        val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+        val keySpec = PBEKeySpec(passphraseOrPin, salt, iterations, KEY_LENGTH)
+        val keyBytes = secretKeyFactory.generateSecret(keySpec).encoded
+        return SecretKeySpec(keyBytes, "AES")
     }
 
-    /* Helper method to parse a file stream into memory */
     @Throws(IOException::class)
     private fun readFile(input: InputStream): String {
         val reader = InputStreamReader(input)

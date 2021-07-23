@@ -2,10 +2,11 @@ package com.example.android.securenote.crypto
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import android.util.Base64InputStream
+import android.util.Base64OutputStream
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -13,12 +14,13 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
-import java.math.BigInteger
 import java.security.*
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.RSAKeyGenParameterSpec
-import java.util.*
-import javax.security.auth.x500.X500Principal
+import java.security.spec.X509EncodedKeySpec
+import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
 
 
 class RSAHardwareEncryptor(context: Context) {
@@ -50,11 +52,72 @@ class RSAHardwareEncryptor(context: Context) {
     }
 
     /**
-     * Create a self-signed certificate and private key in hardware storage.
-     * Persist the (non-secret) public key into SharedPreferences.
+     * Return a cipher text blob of encrypted data, Base64 encoded.
      *
      * @throws GeneralSecurityException
+     * @throws IOException
      */
+    @Throws(GeneralSecurityException::class, IOException::class)
+    fun encryptData(data: ByteArray, outputStream: OutputStream) {
+        val key = retrievePublicKey()
+        val cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM)
+        cipher.init(Cipher.ENCRYPT_MODE, key)
+
+        // Encode output to file
+        var out: OutputStream = Base64OutputStream(outputStream, Base64.NO_WRAP)
+
+        // Encrypt output to encoder
+        out = CipherOutputStream(out, cipher)
+
+        try {
+            out.write(data)
+            out.flush()
+        } finally {
+            out.close()
+        }
+    }
+
+    /**
+     * Return decrypted data from the received cipher text blob.
+     *
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    @Throws(GeneralSecurityException::class, IOException::class)
+    fun decryptData(inputStream: InputStream): ByteArray {
+        val privateKey = retrievePrivateKey()
+
+        val cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM)
+        cipher.init(Cipher.DECRYPT_MODE, privateKey)
+
+        //Decode input from file
+        var input: InputStream = Base64InputStream(inputStream, Base64.NO_WRAP)
+        //Decrypt input from decoder
+        input = CipherInputStream(input, cipher)
+
+        return readFile(input).toByteArray(Charsets.UTF_8)
+    }
+
+    @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
+    fun retrievePublicKey(): Key {
+        val encodedKey = sharedPreferences.getString(KEY_PUBLIC, null)
+            ?: throw RuntimeException("Expected valid public key!")
+
+        val publicKey = Base64.decode(encodedKey, Base64.NO_WRAP)
+        return KeyFactory.getInstance(KEY_ALGORITHM)
+            .generatePublic(X509EncodedKeySpec(publicKey))
+    }
+
+    private fun retrievePrivateKey(): PrivateKey? {
+        val keyStore = KeyStore.getInstance(PROVIDER_NAME).apply {
+            load(null)
+        }
+
+        val entry = keyStore.getEntry(KEY_ALIAS, null) as KeyStore.PrivateKeyEntry
+
+        return entry.privateKey
+    }
+
     @Throws(GeneralSecurityException::class)
     private fun generatePrivateKey() {
         val keyPairGenerator =
@@ -82,64 +145,6 @@ class RSAHardwareEncryptor(context: Context) {
         sharedPreferences.edit().putString(KEY_PUBLIC, encodedKey).apply()
     }
 
-    /**
-     * Return a cipher text blob of encrypted data, Base64 encoded.
-     *
-     * @throws GeneralSecurityException
-     * @throws IOException
-     */
-    @Throws(GeneralSecurityException::class, IOException::class)
-    fun encryptData(data: ByteArray, out: OutputStream) {
-        /*
-         * TODO: Encryption Lab:
-         * Obtain the public key for encryption
-         * Create and init a Cipher (with ENCRYPTION_ALGORITHM)
-         * Wrap the supplied stream in another provides Base64 encoding
-         * Wrap the encoding stream in another that encrypts with cipher
-         * Write the supplied data to the streams.
-         */
-    }
-
-    /**
-     * Return decrypted data from the received cipher text blob.
-     *
-     * @throws GeneralSecurityException
-     * @throws IOException
-     */
-    @Throws(GeneralSecurityException::class, IOException::class)
-    fun decryptData(input: InputStream): ByteArray? {
-        /*
-         * TODO: Encryption Lab:
-         * Obtain the private key for decryption
-         * Create and init a Cipher (with ENCRYPTION_ALGORITHM)
-         * Wrap the supplied stream in another parses Base64 encoding
-         * Wrap the encoding stream in another that decrypts with cipher
-         * Read the stream fully and return the decrypted bytes
-         */
-        return null
-    }
-
-    @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
-    fun retrievePublicKey(): Key? {
-        /*
-         * TODO: Encryption Lab:
-         * Get the encoded key from SharedPreferences
-         * Decode the key (from Base64) to raw bytes
-         * Return a public key instance from the bytes using KeyFactory
-         */
-        return null
-    }
-
-    fun retrievePrivateKey(): PrivateKey? {
-        /*
-         * TODO: Encryption Lab:
-         * Obtain an instance of AndroidKeyStore and load it
-         * Get the private key alias and return the key
-         */
-        return null
-    }
-
-    /* Helper method to parse a file stream into memory */
     @Throws(IOException::class)
     private fun readFile(input: InputStream): String {
         val reader = InputStreamReader(input)
@@ -156,12 +161,11 @@ class RSAHardwareEncryptor(context: Context) {
     }
 
     companion object {
-        private val TAG = RSAHardwareEncryptor::class.java.simpleName
+        private val TAG = "RSAHardwareEncryptor"
         private const val PROVIDER_NAME = "AndroidKeyStore"
         private const val KEY_ALGORITHM = "RSA"
         private const val ENCRYPTION_ALGORITHM = "RSA/ECB/PKCS1Padding"
 
-        //Preferences alias for the public key
         private const val KEY_PUBLIC = "publickey"
 
         //KeyStore alias for the private key
