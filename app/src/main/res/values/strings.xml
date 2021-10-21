@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="failed_to_load">Failed to load your note.</string>
+	<string name="loaded_note">Loaded your note.</string>
+	<string name="failed_to_save">Failed to save your note.</string>
+	<string name="saved_note">Saved your note.</string>
+	<string name="app_name">Secure Note</string>
+	<string name="secure_note_title">Secure Note</string>
+	<string name="note_text_hint">Tell me a secret</string>
+	<string name="load_button">Load</string>
+	<string name="save_button">Save</string>
+	<string name="ok_button">OK</string>
+	<string name="cancel_button">Cancel</string>
+	<string name="get_password_label">Enter your password</string>
+	<string name="password_hint">Password</string>
+	<string name="password_hint_min_length">Password (min %d chars)</string>
+	<string name="password_verification_hint">Password verification</string>
+	<string name="delete_button">Delete</string>
+	<string name="delete_alert">Are you sure you wish to delete?</string>
+	<string name="deleted_note">Deleted your note</string>
+	<string name="failed_to_delete">Failed to delete your note</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+
+</resources>
